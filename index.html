@@ -3,6 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
+  <link rel="manifest" href="manifest.json">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="icon-512.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>阿琦的乐高忍者收藏册</title>
   <style>
@@ -507,10 +511,11 @@
       body {
         background-image: url('ninja-bg-mobile.jpg');
         background-attachment: scroll;
-          .form input {
-    flex-basis: 100%;
-    min-width: 0;
-  }
+      }
+
+      .form input {
+        flex-basis: 100%;
+        min-width: 0;
       }
     }
   </style>
