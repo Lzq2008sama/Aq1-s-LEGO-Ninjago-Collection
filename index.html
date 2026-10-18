@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+  <meta charset="UTF-8">
+  <title>阿琦的乐高忍者收藏册</title>
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background-image: url('ninja-bg.jpg');
+      background-size: cover;
+      background-position: center;
+      background-attachment: fixed;
+
+      font-family: "Microsoft YaHei", sans-serif;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      color: #f5c542;
+      margin: 0 0 4px;
+      font-size: 26px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h1 .logos {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h1 .logo {
+      height: 56px;
+      display: block;
+    }
+
+    .sub {
+      color: #888;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .stats {
+      color: #34d399;
+      font-size: 15px;
+      margin-bottom: 16px;
+      font-weight: bold;
+    }
+
+    .form {
+      background: #1f2233;
+      border: 1px solid #333a55;
+      border-radius: 10px;
+      padding: 16px;
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .form input {
+      background: #12141f;
+      border: 1px solid #333a55;
+      color: #eee;
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .form input:focus {
+      border-color: #f5c542;
+    }
+
+    .form input.name {
+      flex: 2;
+      min-width: 140px;
+    }
+
+    .form input.price {
+      flex: 1;
+      min-width: 90px;
+    }
+
+
+
+    .form input.note {
+      flex: 3;
+      min-width: 160px;
+    }
+
+    .form .photo-wrap {
+      flex-basis: 100%;
+      font-size: 13px;
+      color: #9aa3c0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form button {
+      background: #f5c542;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 6px;
+      padding: 9px 18px;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .form button:hover {
+      background: #ffd764;
+    }
+
+
+    .no {
+      flex: 1;
+      min-width: 110px;
+    }
+
+    .no-tag {
+      color: #34d399;
+      font-size: 12px;
+      font-weight: normal;
+      margin-left: 6px;
+    }
+
+    .roles {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .roles button {
+      border: 2px solid transparent;
+      border-radius: 20px;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .roles button[data-role="杰"] {
+      background: #3a7bc8;
+      color: #fff;
+    }
+
+    .roles button[data-role="凯"] {
+      background: #c04545;
+      color: #fff;
+    }
+
+    .roles button[data-role="赞"] {
+      background: #c9c9c9;
+      color: #000;
+    }
+
+    .roles button[data-role="寇"] {
+      background: #38383f;
+      color: #fff;
+    }
+
+    .roles button[data-role="劳埃德"] {
+      background: #2a9d72;
+      color: #fff;
+    }
+
+    .roles button[data-role="妮娅"] {
+      background: #3f9db5;
+      color: #fff;
+    }
+
+    .roles button[data-role="吴"] {
+      background: #c99a2e;
+      color: #1a1a1a;
+    }
+
+    .roles button[data-role="其他"] {
+      background: #6b7080;
+      color: #fff;
+    }
+
+    .roles button[data-role=""] {
+      background: #2e3342;
+      color: #ccc;
+    }
+
+    .roles button.on {
+      border-color: #fff;
+    }
+
+    .roles button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .roles button .cnt {
+      display: block;
+      font-size: 10px;
+      font-weight: normal;
+      opacity: 0.85;
+    }
+
+    .sort {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .sort button {
+      background: #1f2233;
+      border: 1px solid #333a55;
+      color: #9aa3c0;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .sort button.on {
+      color: #f5c542;
+      border-color: #f5c542;
+    }
+
+    .sort button:hover {
+      transform: translateY(-2px);
+      border-color: #f5c542;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    .search {
+
+      width: 100%;
+      max-width: 660px;
+      background: #1f2233;
+      border: 1px solid #333a55;
+      color: #eee;
+      border-radius: 6px;
+      padding: 9px 12px;
+      font-size: 14px;
+      outline: none;
+      margin-bottom: 14px;
+    }
+
+    .search:focus {
+      border-color: #34d399;
+    }
+
+    .list {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .card {
+      background: #1f2233;
+      border: 1px solid #333a55;
+      border-radius: 10px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: #f5c542;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    }
+
+    button,
+    .lightbox-bar a {
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    }
+
+    .photo {
+      width: 64px;
+      height: 64px;
+      border-radius: 8px;
+      object-fit: cover;
+      background: #12141f;
+      border: 1px solid #333a55;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #666;
+      font-size: 12px;
+      overflow: hidden;
+    }
+
+    .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .card .info {
+      flex: 1;
+    }
+
+    .card .info .n {
+      font-size: 16px;
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .card .info .s {
+      font-size: 13px;
+      color: #9aa3c0;
+      margin-top: 3px;
+    }
+
+    .card .info .p {
+      font-size: 14px;
+      color: #f5c542;
+      font-weight: bold;
+      margin-top: 3px;
+    }
+
+
+
+    .card.editing {
+      flex-wrap: wrap;
+    }
+
+    .card.editing .info input {
+      display: block;
+      width: 100%;
+      margin-bottom: 6px;
+      background: #12141f;
+      border: 1px solid #333a55;
+      color: #eee;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font-size: 14px;
+      outline: none;
+    }
+
+    .card .save {
+      background: #f5c542;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .card .cancel {
+      background: none;
+      border: 1px solid #666;
+      color: #ccc;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .card .edit {
+      background: none;
+      border: 1px solid #2f6f4f;
+      color: #34d399;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .card .edit:hover {
+      background: #1f3a2b;
+    }
+
+    .card .del {
+      background: none;
+      border: 1px solid #7a3b46;
+      color: #ff7b8a;
+      border-radius: 6px;
+      padding: 6px 10px;
+      cursor: pointer;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    .card .del:hover {
+      background: #3a1f26;
+    }
+
+    .lightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.88);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      z-index: 999;
+    }
+
+    .lightbox img {
+      max-width: 90vw;
+      max-height: 72vh;
+      border-radius: 10px;
+      border: 1px solid #333;
+    }
+
+    .lightbox-bar {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .lightbox-bar a {
+      background: #f5c542;
+      color: #1a1a1a;
+      text-decoration: none;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .lightbox-bar button {
+      background: none;
+      border: 1px solid #666;
+      color: #ccc;
+      padding: 9px 18px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .backup {
+      width: 100%;
+      max-width: 660px;
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+
+    .backup button {
+      background: #1f2233;
+      border: 1px solid #333a55;
+      color: #9aa3c0;
+      border-radius: 6px;
+      padding: 8px 16px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .backup button:hover {
+      border-color: #f5c542;
+      color: #f5c542;
+    }
+
+    input[type="file"]::file-selector-button {
+      background: #1f2233;
+      color: #eee;
+      border: 1px solid #333a55;
+      border-radius: 6px;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    input[type="file"]::file-selector-button:hover {
+      border-color: #f5c542;
+      color: #f5c542;
+    }
+
+    .empty {
+      color: #666;
+      text-align: center;
+      padding: 30px 0;
+      font-size: 14px;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        background-image: url('ninja-bg-mobile.jpg');
+        background-attachment: scroll;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <h1>
+    <div class="logos">
+      <img src="lego.png" class="logo">
+      <img src="ninjago.png" class="logo">
+    </div>
+    <span class="title-text">阿琦的乐高忍者收藏册</span>
+  </h1>
+  <div class="sub">幻影旋转!</div>
+  <div class="stats" id="stats">共 0 个人仔</div>
+
+  <div class="form">
+    <input class="name" id="inName" placeholder="人仔名字（如：初代赞）">
+    <input class="no" id="inNo" placeholder="编号（如 njo001）">
+    <input class="price" id="inPrice" type="number" step="0.01" min="0" placeholder="购入价（元）">
+    <input class="note" id="inNote" placeholder="备注（可选）">
+    <div class="photo-wrap">
+      <input type="file" id="inPhoto" accept="image/*">
+      <span>（可选）上传人仔照片，会自动压缩</span>
+    </div>
+    <button id="btnAdd">＋ 添加</button>
+    <button id="btnCancel" style="display:none">取消</button>
+  </div>
+
+  <div class="roles">
+    <button data-role="" class="on">全部</button>
+    <button data-role="赞">赞 Zane<span class="cnt"></span></button>
+    <button data-role="杰">杰 Jay<span class="cnt"></span></button>
+    <button data-role="凯">凯 Kai<span class="cnt"></span></button>
+    <button data-role="寇">寇 Cole<span class="cnt"></span></button>
+    <button data-role="劳埃德">劳埃德 Lloyd<span class="cnt"></span></button>
+    <button data-role="妮娅">妮娅 Nya<span class="cnt"></span></button>
+    <button data-role="吴">吴 Wu<span class="cnt"></span></button>
+    <button data-role="其他">其他<span class="cnt"></span></button>
+  </div>
+  <div class="sort">
+    <button data-sort="default" class="on">默认</button>
+    <button data-sort="asc">编号 ↑</button>
+    <button data-sort="desc">编号 ↓</button>
+  </div>
+  <input class="search" id="inSearch" placeholder="🔍 搜索名字或备注…">
+
+  <div class="list" id="list"></div>
+  <div class="backup">
+    <button id="btnExport">导出备份</button>
+    <button id="btnImport">导入备份</button>
+    <input type="file" id="importFile" accept=".json" style="display:none">
+  </div>
+  <!-- 点击图片后的大图预览 -->
+  <div class="lightbox" id="lightbox" style="display:none">
+    <img id="lightboxImg" src="" alt="">
+    <div class="lightbox-bar">
+      <a id="lightboxDownload" download="ninjago-fig.jpg">保存图片</a>
+      <button id="lightboxClose">关闭</button>
+    </div>
+  </div>
+
+
+  <script>
+    // ========== 1. 数据 ==========
+    let figs = [];   // 先空数组，稍后从 IndexedDB 加载
+    let db = null;   // 数据库连接
+
+    // 打开数据库（IndexedDB 是"异步"的，要先"开门"）
+    function openDB() {
+      return new Promise((resolve) => {
+        const req = indexedDB.open('ninjago_db', 1);
+        req.onupgradeneeded = (e) => {
+          const d = e.target.result;
+          if (!d.objectStoreNames.contains('figs')) {
+            d.createObjectStore('figs');
+          }
+        };
+        req.onsuccess = (e) => { db = e.target.result; resolve(); };
+        req.onerror = () => resolve();
+      });
+    }
+
+    // 从 IndexedDB 读取收藏
+    function loadFigs() {
+      return new Promise((resolve) => {
+        if (!db) { resolve([]); return; }
+        const tx = db.transaction('figs', 'readonly');
+        const req = tx.objectStore('figs').get('figs');
+        req.onsuccess = () => resolve(req.result || []);
+        req.onerror = () => resolve([]);
+      });
+    }
+    let sortMode = 'default';// 排序方式：default / asc / desc
+    let editingId = null;   // 正在编辑的人仔 id，null 表示"添加模式"
+    let activeRole = '';   // 当前选中的角色，空 = 全部
+    const mainRoles = ['杰', '凯', '赞', '寇', '劳埃德', '妮娅', '吴'];  // 主角团（用来算"其他"）
+    let pendingPhoto = null;   // 编辑时暂存的新照片   
+    // 每条：{ id, name, no, price, note, photo }
+
+    const inName = document.getElementById('inName');
+    const inPrice = document.getElementById('inPrice');
+    const inNote = document.getElementById('inNote');
+    const inPhoto = document.getElementById('inPhoto');
+    const inNo = document.getElementById('inNo');
+    const inSearch = document.getElementById('inSearch');
+    const btnAdd = document.getElementById('btnAdd');
+    const btnCancel = document.getElementById('btnCancel');
+    const btnExport = document.getElementById('btnExport');
+    const btnImport = document.getElementById('btnImport');
+    const importFile = document.getElementById('importFile');
+    const listEl = document.getElementById('list');
+    const statsEl = document.getElementById('stats');
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxDownload = document.getElementById('lightboxDownload');
+    const lightboxClose = document.getElementById('lightboxClose');
+
+    // 导出备份：把收藏打包成一个文件下载
+    function exportData() {
+      const d = new Date();
+      const name = '忍者收藏备份_' + d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + '.json';
+      const blob = new Blob([JSON.stringify(figs)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = name;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // 导入备份：读文件内容，恢复收藏
+    function importData(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (!Array.isArray(data)) { alert('文件格式不对'); return; }
+          if (!confirm('导入会覆盖当前的 ' + figs.length + ' 个人仔，确定继续吗？')) return;
+          figs = data;
+          save();
+          render();
+          alert('导入成功！共 ' + figs.length + ' 个人仔');
+        } catch (err) {
+          alert('导入失败：文件不是有效的备份');
+        }
+      };
+      reader.readAsText(file);
+    }
+    function save() {
+      if (!db) return;
+      const tx = db.transaction('figs', 'readwrite');
+      tx.objectStore('figs').put(figs, 'figs');
+    }
+    function escapeHtml(str) {
+      return String(str == null ? '' : str).replace(/[&<>"]/g, c => (
+        { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]
+      ));
+    }
+
+    // ========== 2. 压缩照片（缩小到 300px 宽，转 JPEG，存得下） ==========
+    function compressImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 700;                       // 最长边缩到 300px
+          const scale = Math.min(1, maxW / img.width);
+          const w = Math.max(1, Math.round(img.width * scale));
+          const h = Math.max(1, Math.round(img.height * scale));
+          const canvas = document.createElement('canvas');
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          callback(canvas.toDataURL('image/jpeg', 0.85));   // 质量 0.72
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // ========== 3. 渲染 ==========
+    // 从编号里提取数字（"njo001" -> 1），没有编号返回 null
+    function getNoNum(no) {
+      const m = String(no || '').match(/(\d+)/);
+      return m ? parseInt(m[1], 10) : null;
+    }
+
+
+    // 更新每个角色按钮上的"共 X 款"
+    function updateRoleCounts() {
+      document.querySelectorAll('.roles button').forEach(btn => {
+        const role = btn.dataset.role;
+        if (role === '') return;   // "全部"按钮跳过
+        let list;
+        if (role === '其他') {
+          list = figs.filter(f => !mainRoles.some(r => String(f.name || '').includes(r)));
+        } else {
+          list = figs.filter(f => String(f.name || '').includes(role));
+        }
+        const cnt = btn.querySelector('.cnt');
+        if (cnt) cnt.textContent = '共 ' + list.length + ' 款';
+      });
+    }
+    function render() {
+      const kw = inSearch.value.trim().toLowerCase();
+      let filtered = figs.filter(f =>
+        (String(f.name || '') + ' ' + String(f.note || '')).toLowerCase().includes(kw)
+      );
+      // 角色筛选：点"其他"= 排除主角团，其余 = 名字包含该角色
+      if (activeRole === '其他') {
+        filtered = filtered.filter(f => !mainRoles.some(r => String(f.name || '').includes(r)));
+      } else if (activeRole) {
+        filtered = filtered.filter(f => String(f.name || '').includes(activeRole));
+      }
+      // 排序：有编号的按数字排，没编号的排最后
+      if (sortMode === 'asc' || sortMode === 'desc') {
+        const dir = sortMode === 'asc' ? 1 : -1;
+        const withNo = filtered.filter(f => getNoNum(f.no) !== null);
+        const withoutNo = filtered.filter(f => getNoNum(f.no) === null);
+        withNo.sort((a, b) => dir * (getNoNum(a.no) - getNoNum(b.no)));
+        filtered = withNo.concat(withoutNo);
+      }
+
+      statsEl.textContent = '共 ' + figs.length + ' 个人仔';
+      updateRoleCounts();
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="empty">还没有记录，从上面添加第一个人仔吧！</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(f => {
+        // 正在编辑的这条 -> 原地展开成输入框
+        if (f.id === editingId) {
+          return `
+            <div class="card editing">
+              <div class="photo">${f.photo ? '<img src="' + f.photo + '" alt="">' : '无图'}</div>
+              <div class="info">
+                <input class="edit-name" value="${escapeHtml(f.name)}" placeholder="名字">
+                <input class="edit-no" value="${escapeHtml(f.no || '')}" placeholder="编号">
+                <input class="edit-price" value="${f.price || ''}" placeholder="价格">
+                <input class="edit-note" value="${escapeHtml(f.note || '')}" placeholder="备注">
+                <label class="edit-photo-label">换图：<input type="file" class="edit-photo" accept="image/*"></label>
+              </div>
+              <button class="save" data-id="${f.id}">保存</button>
+              <button class="cancel">取消</button>
+            </div>`;
+        }
+        const priceHtml = f.price ? '<div class="p">购入价 ¥' + Number(f.price).toFixed(2) + '</div>' : '';
+        const photoHtml = f.photo
+          ? '<div class="photo"><img src="' + f.photo + '" alt=""></div>'
+          : '<div class="photo">无图</div>';
+        return `
+          <div class="card">
+            ${photoHtml}
+            <div class="info">
+              <div class="n">${escapeHtml(f.name)}${f.no ? ' <span class="no-tag">' + escapeHtml(f.no) + '</span>' : ''}</div>
+              <div class="s">${escapeHtml(f.note || '—')}</div>
+              ${priceHtml}
+            </div>
+            <button class="edit" data-id="${f.id}">编辑</button>
+            <button class="del" data-id="${f.id}">删除</button>
+          </div>`;
+      }).join('');
+    }
+
+    // ========== 4. 添加 ==========
+    function finishSave(photo) {
+      const name = inName.value.trim();
+      if (!name) { alert('请先填写人仔名字哦～'); return; }
+      const fig = {
+        id: Date.now(),
+        name: name,
+        no: inNo.value.trim(),
+        price: parseFloat(inPrice.value) || 0,
+        note: inNote.value.trim(),
+        photo: photo || ''
+      };
+      figs.push(fig);
+      save();
+      render();
+      inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = ''; inPhoto.value = '';
+      inName.focus();
+    }
+
+
+    function addFig() {
+      const file = inPhoto.files[0];
+      if (file) {
+        compressImage(file, (dataUrl) => finishSave(dataUrl));
+      } else {
+        finishSave(undefined);
+      }
+    }
+
+
+    // ========== 5. 删除 ==========
+    listEl.addEventListener('click', (e) => {
+      // 点"编辑" -> 进入行内编辑
+      const editBtn = e.target.closest('.edit');
+      if (editBtn) {
+        editingId = Number(editBtn.dataset.id);
+        pendingPhoto = null;
+        render();
+        return;
+      }
+      // 点"保存" -> 读取输入框，更新这条记录
+      const saveBtn = e.target.closest('.save');
+      if (saveBtn) {
+        const fig = figs.find(f => f.id === Number(saveBtn.dataset.id));
+        if (fig) {
+          const card = saveBtn.closest('.card');
+          fig.name = card.querySelector('.edit-name').value.trim();
+          fig.no = card.querySelector('.edit-no').value.trim();
+          fig.price = parseFloat(card.querySelector('.edit-price').value) || 0;
+          fig.note = card.querySelector('.edit-note').value.trim();
+          if (pendingPhoto !== null) {
+            fig.photo = pendingPhoto;
+          }
+        }
+        editingId = null;
+        pendingPhoto = null;
+        save();
+        render();
+        return;
+      }
+      // 点"取消" -> 退出编辑
+      const cancelBtn = e.target.closest('.cancel');
+      if (cancelBtn) {
+        pendingPhoto = null;
+        editingId = null;
+        render();
+        return;
+      }
+      const btn = e.target.closest('.del');
+      if (btn) {
+        figs = figs.filter(f => f.id !== Number(btn.dataset.id));
+        save();
+        render();
+        return;
+      }
+      // 点缩略图 -> 放大查看
+      const img = e.target.closest('.photo img');
+      if (img) {
+        lightboxImg.src = img.src;
+        lightboxDownload.href = img.src;
+        lightbox.style.display = 'flex';
+      }
+
+
+    });
+
+    // ========== 6. 事件绑定 ==========
+    btnAdd.addEventListener('click', addFig);
+    btnExport.addEventListener('click', exportData);
+    btnImport.addEventListener('click', () => importFile.click());
+    importFile.addEventListener('change', () => {
+      if (importFile.files[0]) importData(importFile.files[0]);
+    });
+    btnCancel.addEventListener('click', () => {
+      editingId = null;
+      btnAdd.textContent = '＋ 添加';
+      btnCancel.style.display = 'none';
+      inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = ''; inPhoto.value = '';
+    });
+    // 点弹窗背景或"关闭"按钮 -> 关掉大图
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox || e.target === lightboxClose) {
+        lightbox.style.display = 'none';
+      }
+    });
+
+    // 角色标签：点击后筛选 + 高亮
+    document.querySelectorAll('.roles button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        activeRole = btn.dataset.role;
+        document.querySelectorAll('.roles button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        render();
+      });
+    });
+    // 排序按钮：点击后切换排序方式，并高亮当前按钮
+    document.querySelectorAll('.sort button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sortMode = btn.dataset.sort;
+        document.querySelectorAll('.sort button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        render();
+      });
+    });
+
+    inName.addEventListener('keydown', (e) => { if (e.key === 'Enter') addFig(); });
+    inSearch.addEventListener('input', render);
+    // 编辑态换图：选新图后压缩 + 立即更新预览
+    listEl.addEventListener('change', (e) => {
+      const input = e.target.closest('.edit-photo');
+      if (input && input.files[0]) {
+        compressImage(input.files[0], (dataUrl) => {
+          pendingPhoto = dataUrl;
+          const card = input.closest('.card');
+          const photoEl = card.querySelector('.photo');
+          if (photoEl) photoEl.innerHTML = '<img src="' + dataUrl + '" alt="">';
+        });
+      }
+    });
+
+    openDB().then(() => loadFigs()).then((data) => {
+      figs = data;
+      render();
+    });
+  </script>
+</body>
+
+</html>
