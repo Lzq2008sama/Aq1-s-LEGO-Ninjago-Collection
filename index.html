@@ -504,6 +504,54 @@
       color: #f5c542;
     }
 
+    .cropper {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      z-index: 1000;
+      touch-action: none;
+    }
+
+    .crop-title {
+      color: #ccc;
+      font-size: 14px;
+    }
+
+    #cropCanvas {
+      background: #12141f;
+      border: 1px solid #f5c542;
+      border-radius: 8px;
+      cursor: grab;
+    }
+
+    .crop-btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    .crop-btns button {
+      background: #1f2233;
+      border: 1px solid #333a55;
+      color: #eee;
+      border-radius: 6px;
+      padding: 8px 14px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .crop-btns button:hover {
+      border-color: #f5c542;
+      color: #f5c542;
+    }
+
     .empty {
       color: #666;
       text-align: center;
@@ -603,6 +651,17 @@
   <input class="search" id="inSearch" placeholder="🔍 搜索名字或备注…">
 
   <div class="list" id="list"></div>
+  <!-- 裁剪窗口 -->
+  <div class="cropper" id="cropper" style="display:none">
+    <div class="crop-title">拖动图片调整位置，用 ＋/－ 缩放</div>
+    <canvas id="cropCanvas" width="300" height="300"></canvas>
+    <div class="crop-btns">
+      <button id="cropZoomOut">－ 缩小</button>
+      <button id="cropZoomIn">＋ 放大</button>
+      <button id="cropOk">确定</button>
+      <button id="cropCancel">取消</button>
+    </div>
+  </div>
   <div class="backup">
     <button id="btnExport">导出备份</button>
     <button id="btnImport">导入备份</button>
@@ -652,7 +711,16 @@
     let editingId = null;   // 正在编辑的人仔 id，null 表示"添加模式"
     let activeRole = '';   // 当前选中的角色，空 = 全部
     const mainRoles = ['杰', '凯', '赞', '寇', '劳埃德', '妮娅', '吴'];  // 主角团（用来算"其他"）
-    let pendingPhoto = null;   // 编辑时暂存的新照片   
+    let pendingPhoto = null;   // 编辑时暂存的新照片 
+    // ===== 裁剪器状态 =====
+    let cropImg = null;        // 正在裁剪的图片
+    let cropScale = 1;         // 缩放倍数
+    let cropOffsetX = 0;       // 图片偏移 X
+    let cropOffsetY = 0;       // 图片偏移 Y
+    let cropCallback = null;   // 裁剪完成后的回调
+    let cropDragging = false;  // 是否正在拖动
+    let cropLastX = 0, cropLastY = 0;
+    let cropStartOX = 0, cropStartOY = 0;
     // 每条：{ id, name, no, price, note, photo }
 
     const inName = document.getElementById('inName');
@@ -666,6 +734,110 @@
     const btnExport = document.getElementById('btnExport');
     const btnImport = document.getElementById('btnImport');
     const importFile = document.getElementById('importFile');
+    // ===== 图片裁剪器 =====
+    const cropper = document.getElementById('cropper');
+    const cropCanvas = document.getElementById('cropCanvas');
+    const cropCtx = cropCanvas.getContext('2d');
+
+    // 打开裁剪器：图片短边填满裁剪框
+    function openCropper(img, callback) {
+      cropImg = img;
+      cropCallback = callback;
+      cropScale = 300 / Math.min(img.width, img.height);
+      const dw = img.width * cropScale;
+      const dh = img.height * cropScale;
+      cropOffsetX = (300 - dw) / 2;
+      cropOffsetY = (300 - dh) / 2;
+      cropper.style.display = 'flex';
+      drawCrop();
+    }
+
+    // 重绘裁剪框
+    function drawCrop() {
+      if (!cropImg) return;
+      cropCtx.fillStyle = '#12141f';
+      cropCtx.fillRect(0, 0, 300, 300);
+      cropCtx.drawImage(cropImg, cropOffsetX, cropOffsetY, cropImg.width * cropScale, cropImg.height * cropScale);
+    }
+
+    // 缩放（以中心为基准）
+    function zoomCrop(factor) {
+      if (!cropImg) return;
+      const newScale = Math.max(0.3, Math.min(6, cropScale * factor));
+      const cx = 150 - cropOffsetX;
+      const cy = 150 - cropOffsetY;
+      cropOffsetX = 150 - cx * (newScale / cropScale);
+      cropOffsetY = 150 - cy * (newScale / cropScale);
+      cropScale = newScale;
+      drawCrop();
+    }
+
+    // 读图片文件 -> 打开裁剪器
+    function pickImage(file, callback) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => openCropper(img, callback);
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // 鼠标拖拽
+    cropCanvas.addEventListener('mousedown', (e) => {
+      cropDragging = true;
+      cropLastX = e.clientX; cropLastY = e.clientY;
+      cropStartOX = cropOffsetX; cropStartOY = cropOffsetY;
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!cropDragging) return;
+      cropOffsetX = cropStartOX + (e.clientX - cropLastX);
+      cropOffsetY = cropStartOY + (e.clientY - cropLastY);
+      drawCrop();
+    });
+    window.addEventListener('mouseup', () => { cropDragging = false; });
+
+    // 手指拖拽（手机）
+    cropCanvas.addEventListener('touchstart', (e) => {
+      cropDragging = true;
+      cropLastX = e.touches[0].clientX; cropLastY = e.touches[0].clientY;
+      cropStartOX = cropOffsetX; cropStartOY = cropOffsetY;
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchmove', (e) => {
+      if (!cropDragging) return;
+      cropOffsetX = cropStartOX + (e.touches[0].clientX - cropLastX);
+      cropOffsetY = cropStartOY + (e.touches[0].clientY - cropLastY);
+      drawCrop();
+      e.preventDefault();
+    }, { passive: false });
+    window.addEventListener('touchend', () => { cropDragging = false; });
+
+    // 确定：裁剪成 500x500 并输出
+    document.getElementById('cropOk').addEventListener('click', () => {
+      if (!cropImg) return;
+      const srcW = 300 / cropScale;
+      const srcH = 300 / cropScale;
+      const srcX = -cropOffsetX / cropScale;
+      const srcY = -cropOffsetY / cropScale;
+      const out = document.createElement('canvas');
+      out.width = 500; out.height = 500;
+      out.getContext('2d').drawImage(cropImg, srcX, srcY, srcW, srcH, 0, 0, 500, 500);
+      const dataUrl = out.toDataURL('image/jpeg', 0.85);
+      cropper.style.display = 'none';
+      cropImg = null;
+      if (cropCallback) cropCallback(dataUrl);
+    });
+
+    // 取消
+    document.getElementById('cropCancel').addEventListener('click', () => {
+      cropper.style.display = 'none';
+      cropImg = null;
+    });
+
+    // 缩放按钮
+    document.getElementById('cropZoomIn').addEventListener('click', () => zoomCrop(1.2));
+    document.getElementById('cropZoomOut').addEventListener('click', () => zoomCrop(1 / 1.2));
     const listEl = document.getElementById('list');
     const statsEl = document.getElementById('stats');
     const lightbox = document.getElementById('lightbox');
@@ -715,25 +887,6 @@
       ));
     }
 
-    // ========== 2. 压缩照片（缩小到 300px 宽，转 JPEG，存得下） ==========
-    function compressImage(file, callback) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => {
-          const maxW = (window.innerWidth <= 600) ? 450 : 700;                      // 最长边缩到 300px
-          const scale = Math.min(1, maxW / img.width);
-          const w = Math.max(1, Math.round(img.width * scale));
-          const h = Math.max(1, Math.round(img.height * scale));
-          const canvas = document.createElement('canvas');
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          callback(canvas.toDataURL('image/jpeg', 0.85));   // 质量 0.72
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
 
     // ========== 3. 渲染 ==========
     // 从编号里提取数字（"njo001" -> 1），没有编号返回 null
@@ -844,7 +997,7 @@
     function addFig() {
       const file = inPhoto.files[0];
       if (file) {
-        compressImage(file, (dataUrl) => finishSave(dataUrl));
+        pickImage(file, (dataUrl) => finishSave(dataUrl));
       } else {
         finishSave(undefined);
       }
@@ -952,7 +1105,7 @@
     listEl.addEventListener('change', (e) => {
       const input = e.target.closest('.edit-photo');
       if (input && input.files[0]) {
-        compressImage(input.files[0], (dataUrl) => {
+        pickImage(input.files[0], (dataUrl) => {
           pendingPhoto = dataUrl;
           const card = input.closest('.card');
           const photoEl = card.querySelector('.photo');
