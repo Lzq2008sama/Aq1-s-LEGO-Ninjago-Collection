@@ -7,7 +7,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <link rel="apple-touch-icon" href="icon-180.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>阿琦的乐高忍者收藏册</title>
   <style>
     html,
@@ -747,6 +747,8 @@
     // ========== 1. 数据 ==========
     let figs = [];   // 先空数组，稍后从 IndexedDB 加载
     let db = null;   // 数据库连接
+        // 禁止双指缩放（iOS 专用，不影响键盘弹出）
+    document.addEventListener('gesturestart', (e) => { e.preventDefault(); });
 
     // 打开数据库（IndexedDB 是"异步"的，要先"开门"）
     function openDB() {
