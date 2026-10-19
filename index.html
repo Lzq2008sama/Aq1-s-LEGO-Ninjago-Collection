@@ -10,7 +10,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>阿琦的乐高忍者收藏册</title>
   <style>
-  html, body { touch-action: manipulation; }
+    html,
+    body {
+      touch-action: manipulation;
+    }
+
     html {
       background: #151726;
     }
@@ -298,8 +302,7 @@
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
 
-    button,
-    .lightbox-bar a {
+    button {
       transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
     }
 
@@ -446,16 +449,6 @@
       align-items: center;
     }
 
-    .lightbox-bar a {
-      background: #f5c542;
-      color: #1a1a1a;
-      text-decoration: none;
-      padding: 9px 18px;
-      border-radius: 6px;
-      font-weight: bold;
-      font-size: 14px;
-    }
-
     .lightbox-bar button {
       background: none;
       border: 1px solid #666;
@@ -527,35 +520,40 @@
     }
 
     .crop-box {
-  position: relative;
-}
-.crop-cross {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 24px;
-  height: 24px;
-  pointer-events: none;
-}
-.crop-cross::before,
-.crop-cross::after {
-  content: '';
-  position: absolute;
-  background: rgba(255, 255, 255, 0.75);
-}
-.crop-cross::before {
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-}
-.crop-cross::after {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-}
+      position: relative;
+    }
+
+    .crop-cross {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+
+    .crop-cross::before,
+    .crop-cross::after {
+      content: '';
+      position: absolute;
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .crop-cross::before {
+      left: 0;
+      right: 0;
+      top: 50%;
+      height: 1px;
+    }
+
+    .crop-cross::after {
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 1px;
+    }
+
     #cropCanvas {
       background: #12141f;
       border: 1px solid #f5c542;
@@ -638,6 +636,7 @@
     }
   </style>
 </head>
+
 <body>
   <h1>
     <div class="logos">
@@ -685,9 +684,9 @@
   <div class="cropper" id="cropper" style="display:none">
     <div class="crop-title">拖动图片调整位置，用 ＋/－ 缩放</div>
     <div class="crop-box">
-  <canvas id="cropCanvas" width="300" height="300"></canvas>
-  <div class="crop-cross"></div>
-</div>
+      <canvas id="cropCanvas" width="300" height="300"></canvas>
+      <div class="crop-cross"></div>
+    </div>
     <div class="crop-btns">
       <button id="cropZoomOut">－ 缩小</button>
       <button id="cropZoomIn">＋ 放大</button>
@@ -704,13 +703,12 @@
   <div class="lightbox" id="lightbox" style="display:none">
     <img id="lightboxImg" src="" alt="">
     <div class="lightbox-bar">
-      <a id="lightboxDownload" download="ninjago-fig.jpg">保存图片</a>
       <button id="lightboxClose">关闭</button>
     </div>
   </div>
 
 
-<script>
+  <script>
     // ========== 1. 数据 ==========
     let figs = [];   // 先空数组，稍后从 IndexedDB 加载
     let db = null;   // 数据库连接
@@ -808,31 +806,31 @@
     }
 
     // 压缩原图（保留大图，供以后重新裁剪）
-function compressOriginal(img, callback) {
-  const maxW = 1500;
-  const scale = Math.min(1, maxW / img.width);
-  const w = Math.max(1, Math.round(img.width * scale));
-  const h = Math.max(1, Math.round(img.height * scale));
-  const canvas = document.createElement('canvas');
-  canvas.width = w; canvas.height = h;
-  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-  callback(canvas.toDataURL('image/jpeg', 0.75));
-}
+    function compressOriginal(img, callback) {
+      const maxW = 1500;
+      const scale = Math.min(1, maxW / img.width);
+      const w = Math.max(1, Math.round(img.width * scale));
+      const h = Math.max(1, Math.round(img.height * scale));
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      callback(canvas.toDataURL('image/jpeg', 0.75));
+    }
 
     // 读图片文件 -> 打开裁剪器
     function pickImage(file, callback) {
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const img = new Image();
-    img.onload = () => {
-      compressOriginal(img, (original) => {
-        openCropper(img, (cropped) => callback(cropped, original));
-      });
-    };
-    img.src = e.target.result;
-  };
-  reader.readAsDataURL(file);
-}
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          compressOriginal(img, (original) => {
+            openCropper(img, (cropped) => callback(cropped, original));
+          });
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
 
 
     // 鼠标拖拽
@@ -894,7 +892,6 @@ function compressOriginal(img, callback) {
     const statsEl = document.getElementById('stats');
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
-    const lightboxDownload = document.getElementById('lightboxDownload');
     const lightboxClose = document.getElementById('lightboxClose');
 
     // 导出备份：把收藏打包成一个文件下载
@@ -1060,8 +1057,8 @@ function compressOriginal(img, callback) {
 
     // ========== 5. 删除 ==========
     listEl.addEventListener('click', (e) => {
-           
-    // 点"编辑" -> 进入行内编辑
+
+      // 点"编辑" -> 进入行内编辑
       const editBtn = e.target.closest('.edit');
       if (editBtn) {
         editingId = Number(editBtn.dataset.id);
@@ -1081,9 +1078,9 @@ function compressOriginal(img, callback) {
           fig.price = parseFloat(card.querySelector('.edit-price').value) || 0;
           fig.note = card.querySelector('.edit-note').value.trim();
           if (pendingPhoto !== null) {
-  fig.photo = pendingPhoto;
-  fig.photoOriginal = pendingOriginal;
-}
+            fig.photo = pendingPhoto;
+            fig.photoOriginal = pendingOriginal;
+          }
         }
         editingId = null;
         pendingPhoto = null;
@@ -1112,7 +1109,6 @@ function compressOriginal(img, callback) {
       const img = e.target.closest('.photo img');
       if (img) {
         lightboxImg.src = img.src;
-        lightboxDownload.href = img.src;
         lightbox.style.display = 'flex';
       }
 
