@@ -527,6 +527,36 @@
       font-size: 14px;
     }
 
+    .crop-box {
+  position: relative;
+}
+.crop-cross {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+.crop-cross::before,
+.crop-cross::after {
+  content: '';
+  position: absolute;
+  background: rgba(255, 255, 255, 0.75);
+}
+.crop-cross::before {
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+}
+.crop-cross::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+}
     #cropCanvas {
       background: #12141f;
       border: 1px solid #f5c542;
@@ -655,7 +685,10 @@
   <!-- 裁剪窗口 -->
   <div class="cropper" id="cropper" style="display:none">
     <div class="crop-title">拖动图片调整位置，用 ＋/－ 缩放</div>
-    <canvas id="cropCanvas" width="300" height="300"></canvas>
+    <div class="crop-box">
+  <canvas id="cropCanvas" width="300" height="300"></canvas>
+  <div class="crop-cross"></div>
+</div>
     <div class="crop-btns">
       <button id="cropZoomOut">－ 缩小</button>
       <button id="cropZoomIn">＋ 放大</button>
