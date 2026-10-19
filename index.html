@@ -472,6 +472,26 @@
       cursor: pointer;
       font-size: 14px;
     }
+        .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 40px;
+      transform: translateX(-50%);
+      background: #f5c542;
+      color: #1a1a1a;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 14px;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .toast.show {
+      opacity: 1;
+    }
+
 
     .backup {
       width: 100%;
@@ -714,6 +734,7 @@
     <input type="file" id="importFile" accept=".json" style="display:none">
   </div>
   <!-- 点击图片后的大图预览 -->
+    <div class="toast" id="toast"></div>
   <div class="lightbox" id="lightbox" style="display:none">
     <img id="lightboxImg" src="" alt="">
     <div class="lightbox-bar">
@@ -774,6 +795,7 @@
     const inPrice = document.getElementById('inPrice');
     const inNote = document.getElementById('inNote');
     const inPhoto = document.getElementById('inPhoto');
+    inPhoto.addEventListener('change', () => { inPhoto.blur(); });
     const inNo = document.getElementById('inNo');
     const inSearch = document.getElementById('inSearch');
     const btnAdd = document.getElementById('btnAdd');
@@ -847,14 +869,14 @@
     }
 
 
-    // 鼠标拖拽
+        // 鼠标拖拽
     cropCanvas.addEventListener('mousedown', (e) => {
       cropDragging = true;
       cropLastX = e.clientX; cropLastY = e.clientY;
       cropStartOX = cropOffsetX; cropStartOY = cropOffsetY;
     });
     window.addEventListener('mousemove', (e) => {
-      if (!cropDragging) return;
+      if (!cropDragging || !cropImg) return;
       cropOffsetX = cropStartOX + (e.clientX - cropLastX);
       cropOffsetY = cropStartOY + (e.clientY - cropLastY);
       drawCrop();
@@ -869,13 +891,15 @@
       e.preventDefault();
     }, { passive: false });
     window.addEventListener('touchmove', (e) => {
-      if (!cropDragging) return;
+      if (!cropDragging || !cropImg) return;
       cropOffsetX = cropStartOX + (e.touches[0].clientX - cropLastX);
       cropOffsetY = cropStartOY + (e.touches[0].clientY - cropLastY);
       drawCrop();
       e.preventDefault();
     }, { passive: false });
     window.addEventListener('touchend', () => { cropDragging = false; });
+    window.addEventListener('touchcancel', () => { cropDragging = false; });
+
 
     // 确定：裁剪成 500x500 并输出
     document.getElementById('cropOk').addEventListener('click', () => {
@@ -1037,10 +1061,20 @@
       }).join('');
     }
 
+        // 自制小提示（iOS 主屏 PWA 里 alert 弹不出来，用它替代）
+    const toastEl = document.getElementById('toast');
+    let toastTimer = null;
+    function toast(msg) {
+      toastEl.textContent = msg;
+      toastEl.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toastEl.classList.remove('show'), 2500);
+    }
+
     // ========== 4. 添加 ==========
     function finishSave(photo, photoOriginal) {
       const name = inName.value.trim();
-      if (!name) { alert('请先填写人仔名字哦～'); return; }
+      if (!name) { toast('请先填写人仔名字哦～'); return; }
       const fig = {
         id: Date.now(),
         name: name,
