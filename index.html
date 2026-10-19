@@ -13,7 +13,7 @@
     html {
       background: #151726;
     }
-    
+
     body {
       margin: 0;
       min-height: 100vh;
@@ -521,32 +521,41 @@
         flex-basis: 100%;
         min-width: 0;
       }
-       .roles {
-    gap: 4px;
-  }
-  .roles button {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    padding: 0;
-    font-size: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  .roles button .cnt {
-    font-size: 9px;
-    display: block;
-    line-height: 1;
-  }
-  .roles button[data-role=""] {
-    width: auto;
-    height: auto;
-    border-radius: 20px;
-    padding: 4px 8px;
-    font-size: 12px;
-  }   
+
+      .roles {
+        display: flex;
+        gap: 3px;
+        align-items: center;
+      }
+
+      .roles button {
+        flex: 1;
+        height: 38px;
+        border-radius: 8px;
+        padding: 0;
+        font-size: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-width: 0;
+      }
+
+      .roles button .cnt {
+        font-size: 10px;
+        display: block;
+        line-height: 1;
+      }
+
+      .roles button[data-role=""] {
+        flex: 1;
+        height: 38px;
+        border-radius: 8px;
+        padding: 0;
+        font-size: 11px;
+      }
+
+    }
     }
   </style>
 </head>
@@ -712,7 +721,7 @@
       reader.onload = (e) => {
         const img = new Image();
         img.onload = () => {
-          const maxW = 700;                       // 最长边缩到 300px
+          const maxW = (window.innerWidth <= 600) ? 450 : 700;                      // 最长边缩到 300px
           const scale = Math.min(1, maxW / img.width);
           const w = Math.max(1, Math.round(img.width * scale));
           const h = Math.max(1, Math.round(img.height * scale));
