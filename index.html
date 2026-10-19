@@ -301,6 +301,20 @@
       border-color: #f5c542;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
+        .card.highlight {
+      animation: cardFlash 0.8s ease 3;
+    }
+
+    @keyframes cardFlash {
+      0%, 100% {
+        border-color: #333a55;
+        box-shadow: none;
+      }
+      50% {
+        border-color: #f5c542;
+        box-shadow: 0 0 16px rgba(245, 197, 66, 0.8);
+      }
+    }
 
     button {
       transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.2s, box-shadow 0.2s;
@@ -1010,7 +1024,7 @@
           ? '<div class="photo"><img src="' + f.photo + '" alt=""></div>'
           : '<div class="photo">无图</div>';
         return `
-          <div class="card">
+            <div class="card" data-id="${f.id}">
             ${photoHtml}
             <div class="info">
               <div class="n">${escapeHtml(f.name)}${f.no ? ' <span class="no-tag">' + escapeHtml(f.no) + '</span>' : ''}</div>
@@ -1037,11 +1051,17 @@
         photoOriginal: photoOriginal || ''
 
       };
-      figs.push(fig);
+            figs.push(fig);
       save();
       render();
       inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = ''; inPhoto.value = '';
-      inName.focus();
+      // 定位到刚添加的人仔并高亮
+      const newCard = document.querySelector('.card[data-id="' + fig.id + '"]');
+      if (newCard) {
+        newCard.classList.add('highlight');
+        newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => newCard.classList.remove('highlight'), 2500);
+      }
     }
 
 
