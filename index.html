@@ -1017,7 +1017,7 @@ function compressOriginal(img, callback) {
         }
         const priceHtml = f.price ? '<div class="p">购入价 ¥' + Number(f.price).toFixed(2) + '</div>' : '';
         const photoHtml = f.photo
-          ? '<div class="photo"><img src="' + f.photo + '" alt=""></div>'
+          ? '<div class="photo"><img src="' + f.photo + '" alt="" loading="lazy"></div>'
           : '<div class="photo">无图</div>';
         return `
           <div class="card" data-id="${f.id}">
