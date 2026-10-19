@@ -378,6 +378,8 @@
       font-weight: bold;
     }
 
+    .edit-photo-preview { cursor: pointer; }
+
     .card .cancel {
       background: none;
       border: 1px solid #666;
@@ -996,7 +998,7 @@ function compressOriginal(img, callback) {
         if (f.id === editingId) {
           return `
             <div class="card editing">
-              <div class="photo">${f.photo ? '<img src="' + f.photo + '" alt="">' : '无图'}</div>
+              <div class="photo edit-photo-preview" data-id="${f.id}" title="点击重新裁剪">${f.photo ? '<img src="' + f.photo + '" alt="">' : '无图'}</div>
               <div class="info">
                 <input class="edit-name" value="${escapeHtml(f.name)}" placeholder="名字">
                 <input class="edit-no" value="${escapeHtml(f.no || '')}" placeholder="编号">
@@ -1060,8 +1062,22 @@ function compressOriginal(img, callback) {
 
     // ========== 5. 删除 ==========
     listEl.addEventListener('click', (e) => {
-           
-    // 点"编辑" -> 进入行内编辑
+            // 点编辑态照片 -> 重新裁剪
+      const editPhoto = e.target.closest('.edit-photo-preview');
+      if (editPhoto) {
+        const fig = figs.find(f => f.id === Number(editPhoto.dataset.id));
+        if (fig && fig.photo) {
+          const img = new Image();
+          img.onload = () => openCropper(img, (dataUrl) => {
+            pendingPhoto = dataUrl;
+            editPhoto.innerHTML = '<img src="' + dataUrl + '" alt="">';
+          });
+          img.src = fig.photoOriginal || fig.photo;
+        }
+        return;
+      }
+
+      // 点"编辑" -> 进入行内编辑
       const editBtn = e.target.closest('.edit');
       if (editBtn) {
         editingId = Number(editBtn.dataset.id);
