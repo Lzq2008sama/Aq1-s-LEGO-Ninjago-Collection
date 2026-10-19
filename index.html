@@ -377,6 +377,8 @@
       font-weight: bold;
     }
 
+    .edit-photo-preview { cursor: pointer; }
+
     .card .cancel {
       background: none;
       border: 1px solid #666;
@@ -607,7 +609,6 @@
     }
   </style>
 </head>
-
 <body>
   <h1>
     <div class="logos">
@@ -677,7 +678,7 @@
   </div>
 
 
-  <script>
+<script>
     // ========== 1. 数据 ==========
     let figs = [];   // 先空数组，稍后从 IndexedDB 加载
     let db = null;   // 数据库连接
@@ -712,6 +713,8 @@
     let activeRole = '';   // 当前选中的角色，空 = 全部
     const mainRoles = ['杰', '凯', '赞', '寇', '劳埃德', '妮娅', '吴'];  // 主角团（用来算"其他"）
     let pendingPhoto = null;   // 编辑时暂存的新照片 
+    let pendingOriginal = null;   // 编辑时暂存的原图
+
     // ===== 裁剪器状态 =====
     let cropImg = null;        // 正在裁剪的图片
     let cropScale = 1;         // 缩放倍数
@@ -772,16 +775,33 @@
       drawCrop();
     }
 
+    // 压缩原图（保留大图，供以后重新裁剪）
+function compressOriginal(img, callback) {
+  const maxW = 1500;
+  const scale = Math.min(1, maxW / img.width);
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
+  const canvas = document.createElement('canvas');
+  canvas.width = w; canvas.height = h;
+  canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+  callback(canvas.toDataURL('image/jpeg', 0.75));
+}
+
     // 读图片文件 -> 打开裁剪器
     function pickImage(file, callback) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const img = new Image();
-        img.onload = () => openCropper(img, callback);
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const img = new Image();
+    img.onload = () => {
+      compressOriginal(img, (original) => {
+        openCropper(img, (cropped) => callback(cropped, original));
+      });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
 
     // 鼠标拖拽
     cropCanvas.addEventListener('mousedown', (e) => {
@@ -944,7 +964,7 @@
         if (f.id === editingId) {
           return `
             <div class="card editing">
-              <div class="photo">${f.photo ? '<img src="' + f.photo + '" alt="">' : '无图'}</div>
+              <div class="photo edit-photo-preview" data-id="${f.id}" title="点击重新裁剪">${f.photo ? '<img src="' + f.photo + '" alt="">' : '无图'}</div>
               <div class="info">
                 <input class="edit-name" value="${escapeHtml(f.name)}" placeholder="名字">
                 <input class="edit-no" value="${escapeHtml(f.no || '')}" placeholder="编号">
@@ -975,7 +995,7 @@
     }
 
     // ========== 4. 添加 ==========
-    function finishSave(photo) {
+    function finishSave(photo, photoOriginal) {
       const name = inName.value.trim();
       if (!name) { alert('请先填写人仔名字哦～'); return; }
       const fig = {
@@ -984,7 +1004,9 @@
         no: inNo.value.trim(),
         price: parseFloat(inPrice.value) || 0,
         note: inNote.value.trim(),
-        photo: photo || ''
+        photo: photo || '',
+        photoOriginal: photoOriginal || ''
+
       };
       figs.push(fig);
       save();
@@ -997,20 +1019,36 @@
     function addFig() {
       const file = inPhoto.files[0];
       if (file) {
-        pickImage(file, (dataUrl) => finishSave(dataUrl));
+        pickImage(file, (dataUrl, original) => finishSave(dataUrl, original));
       } else {
-        finishSave(undefined);
+        finishSave(undefined, undefined);
       }
     }
 
 
     // ========== 5. 删除 ==========
     listEl.addEventListener('click', (e) => {
+            // 点编辑态照片 -> 重新裁剪
+      const editPhoto = e.target.closest('.edit-photo-preview');
+      if (editPhoto) {
+        const fig = figs.find(f => f.id === Number(editPhoto.dataset.id));
+        if (fig && fig.photo) {
+          const img = new Image();
+          img.onload = () => openCropper(img, (dataUrl) => {
+            pendingPhoto = dataUrl;
+            editPhoto.innerHTML = '<img src="' + dataUrl + '" alt="">';
+          });
+          img.src = fig.photoOriginal || fig.photo;
+        }
+        return;
+      }
+
       // 点"编辑" -> 进入行内编辑
       const editBtn = e.target.closest('.edit');
       if (editBtn) {
         editingId = Number(editBtn.dataset.id);
         pendingPhoto = null;
+        pendingOriginal = null;
         render();
         return;
       }
@@ -1025,11 +1063,13 @@
           fig.price = parseFloat(card.querySelector('.edit-price').value) || 0;
           fig.note = card.querySelector('.edit-note').value.trim();
           if (pendingPhoto !== null) {
-            fig.photo = pendingPhoto;
-          }
+  fig.photo = pendingPhoto;
+  fig.photoOriginal = pendingOriginal;
+}
         }
         editingId = null;
         pendingPhoto = null;
+        pendingOriginal = null;
         save();
         render();
         return;
@@ -1038,6 +1078,7 @@
       const cancelBtn = e.target.closest('.cancel');
       if (cancelBtn) {
         pendingPhoto = null;
+        pendingOriginal = null;
         editingId = null;
         render();
         return;
@@ -1105,8 +1146,9 @@
     listEl.addEventListener('change', (e) => {
       const input = e.target.closest('.edit-photo');
       if (input && input.files[0]) {
-        pickImage(input.files[0], (dataUrl) => {
+        pickImage(input.files[0], (dataUrl, original) => {
           pendingPhoto = dataUrl;
+          pendingOriginal = original;
           const card = input.closest('.card');
           const photoEl = card.querySelector('.photo');
           if (photoEl) photoEl.innerHTML = '<img src="' + dataUrl + '" alt="">';
