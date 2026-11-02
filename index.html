@@ -435,6 +435,64 @@
       background: #3a1f26;
     }
 
+    /* 已经点过一次:这个按钮进入"待确认",再点一下才真删 */
+    .card .del.arm {
+      background: #b3202f;
+      border-color: #ff4d5e;
+      color: #fff;
+      font-weight: bold;
+    }
+
+    .card .del.arm:hover {
+      background: #cf2537;
+    }
+
+    /* 删除后底部的撤销提示条 */
+    .undo-bar {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translate(-50%, 16px);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #23273a;
+      border: 1px solid #3a4160;
+      border-radius: 10px;
+      padding: 12px 16px;
+      box-shadow: 0 10px 28px rgba(0, 0, 0, .5);
+      font-size: 14px;
+      color: #eee;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease, transform .2s ease;
+      z-index: 1100;
+      max-width: calc(100vw - 32px);
+      box-sizing: border-box;
+    }
+
+    .undo-bar.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+      pointer-events: auto;
+    }
+
+    .undo-bar button {
+      background: #f5c542;
+      color: #1a1a1a;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: 13px;
+      font-weight: bold;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .undo-bar button:hover {
+      background: #ffd764;
+    }
+
     .lightbox {
       position: fixed;
       top: 0;
@@ -717,6 +775,12 @@
     </div>
   </div>
 
+  <!-- 删除后弹出的撤销提示 -->
+  <div id="undoBar" class="undo-bar">
+    <span id="undoText"></span>
+    <button id="undoBtn">撤销</button>
+  </div>
+
 
 <script>
     // ========== 1. 数据 ==========
@@ -754,6 +818,10 @@
     const mainRoles = ['杰', '凯', '赞', '寇', '劳埃德', '妮娅', '吴'];  // 主角团（用来算"其他"）
     let pendingPhoto = null;   // 编辑时暂存的新照片 
     let pendingOriginal = null;   // 编辑时暂存的原图
+    let armedDelId = null;        // 当前处于"确认删除?"状态的人仔 id
+    let armTimer = null;          // 待确认状态的倒计时（3 秒后自动取消）
+    let undoRecord = null;        // 最近一次删除的记录 { fig, index }
+    let undoTimer = null;         // 撤销条的倒计时（6 秒后自动消失）
 
     // ===== 裁剪器状态 =====
     let cropImg = null;        // 正在裁剪的图片
@@ -1071,9 +1139,89 @@ function compressOriginal(img, callback) {
     }
 
 
+    // ========== 4.5 删除确认 / 撤销 ==========
+    const undoBar = document.getElementById('undoBar');
+    const undoText = document.getElementById('undoText');
+    const undoBtn = document.getElementById('undoBtn');
+
+    // 取消所有"待确认删除"状态，把按钮恢复成"删除"
+    function disarmDelete() {
+      clearTimeout(armTimer);
+      armTimer = null;
+      armedDelId = null;
+      document.querySelectorAll('.card .del.arm').forEach(b => {
+        b.classList.remove('arm');
+        b.textContent = '删除';
+      });
+    }
+
+    // 删除后弹出撤销条，6 秒内可以点"撤销"救回来
+    function showUndo(fig, index) {
+      undoRecord = { fig: fig, index: index };
+      undoText.textContent = '已删除「' + (fig.name || '未命名') + '」';
+      undoBar.classList.add('show');
+      clearTimeout(undoTimer);
+      undoTimer = setTimeout(hideUndo, 6000);
+    }
+
+    function hideUndo() {
+      clearTimeout(undoTimer);
+      undoTimer = null;
+      undoRecord = null;
+      undoBar.classList.remove('show');
+    }
+
+    // 点"撤销"：把刚删的那条放回原来的位置
+    undoBtn.addEventListener('click', () => {
+      if (!undoRecord) return;
+      const fig = undoRecord.fig;
+      const at = Math.min(undoRecord.index, figs.length);
+      figs.splice(at, 0, fig);
+      hideUndo();
+      save();
+      render();
+      // 滚到它身上闪一下，让你看见它回来了
+      const back = document.querySelector('.card[data-id="' + fig.id + '"]');
+      if (back) {
+        back.classList.add('highlight');
+        back.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        setTimeout(() => back.classList.remove('highlight'), 2500);
+      }
+    });
+
     // ========== 5. 删除 ==========
     listEl.addEventListener('click', (e) => {
-            // 点编辑态照片 -> 重新裁剪
+      // ---- 删除：第一下只"上膛"，第二下才真删 ----
+      const delBtn = e.target.closest('.del');
+      if (delBtn) {
+        const id = Number(delBtn.dataset.id);
+
+        // 第一下：按钮变红，变成"确认删除？"
+        if (!delBtn.classList.contains('arm')) {
+          disarmDelete();                     // 先取消别的按钮的待确认
+          delBtn.classList.add('arm');
+          delBtn.textContent = '确认删除?';
+          armedDelId = id;
+          armTimer = setTimeout(disarmDelete, 3000);   // 3 秒不点就自动收回
+          return;
+        }
+
+        // 第二下：真的删，并且留一个撤销的机会
+        const idx = figs.findIndex(f => f.id === id);
+        if (idx < 0) { disarmDelete(); return; }
+        const removed = figs[idx];
+        figs.splice(idx, 1);
+        disarmDelete();
+        save();
+        render();
+        showUndo(removed, idx);
+        return;
+      }
+
+      // 点了卡片上别的地方，就取消掉"待确认"状态
+      disarmDelete();
+
+      // 点编辑态照片 -> 重新裁剪
       const editPhoto = e.target.closest('.edit-photo-preview');
       if (editPhoto) {
         const fig = figs.find(f => f.id === Number(editPhoto.dataset.id));
@@ -1125,13 +1273,6 @@ function compressOriginal(img, callback) {
         pendingPhoto = null;
         pendingOriginal = null;
         editingId = null;
-        render();
-        return;
-      }
-      const btn = e.target.closest('.del');
-      if (btn) {
-        figs = figs.filter(f => f.id !== Number(btn.dataset.id));
-        save();
         render();
         return;
       }
