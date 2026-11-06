@@ -53,16 +53,38 @@
       display: block;
     }
 
-    .sub {
-      color: #888;
-      font-size: 13px;
-      margin-bottom: 14px;
+    /* 主标题：机械感 */
+    h1 .title-text {
+      font-family: "Impact", "Haettenschweiler", "Arial Black",
+                   "Microsoft YaHei", "PingFang SC", sans-serif;
+      font-weight: 900;
+      font-size: 30px;
+      letter-spacing: 3px;
+      line-height: 1.2;
+      transform: skewX(-7deg);
+      background: linear-gradient(180deg, #fff8c9 0%, #f5c542 42%, #d09a12 76%, #8a6206 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(2px 3px 0 #16151a) drop-shadow(0 0 9px rgba(245, 197, 66, 0.28));
+      white-space: nowrap;
+    }
+
+    /* 手机窄屏：缩小字号和字距，避免标题被挤断 */
+    @media (max-width: 480px) {
+      h1 .title-text {
+        font-size: 21px;
+        letter-spacing: 1px;
+        transform: skewX(-6deg);
+        filter: drop-shadow(1px 2px 0 #16151a) drop-shadow(0 0 6px rgba(245, 197, 66, 0.25));
+      }
     }
 
     .stats {
       color: #34d399;
       font-size: 15px;
-      margin-bottom: 16px;
+      margin-bottom: 13px;
       font-weight: bold;
     }
 
@@ -73,10 +95,13 @@
       padding: 16px;
       width: 100%;
       max-width: 660px;
+      min-width: 0;
+      box-sizing: border-box;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       margin-bottom: 14px;
+      box-sizing: border-box;
     }
 
     .form input {
@@ -87,36 +112,116 @@
       padding: 9px 12px;
       font-size: 14px;
       outline: none;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .form input:focus {
       border-color: #f5c542;
     }
 
-    .form input.name {
-      flex: 2;
-      min-width: 140px;
-    }
-
-    .form input.price {
-      flex: 1;
-      min-width: 90px;
-    }
-
-
-
+    /* 四个输入框：两两一行 */
+    .form input.name,
+    .form input.no,
+    .form input.price,
     .form input.note {
-      flex: 3;
-      min-width: 160px;
+      flex: 0 0 auto;
+      width: calc((100% - 10px) / 2);
+      min-width: 0;
     }
 
-    .form .photo-wrap {
-      flex-basis: 100%;
-      font-size: 13px;
-      color: #9aa3c0;
+    /* 照片行：左侧撑满的选择卡 + 右侧确定按钮 */
+    .form .photo-row {
       display: flex;
       align-items: center;
       gap: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .form .photo-pick {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 10px;
+      box-sizing: border-box;
+      border: 1px dashed #3d4460;
+      border-radius: 8px;
+      background: #12141f;
+      cursor: pointer;
+      user-select: none;
+      overflow: hidden;
+      transition: border-color .15s, background .15s;
+    }
+
+    .form .photo-pick:hover {
+      border-color: #f5c542;
+      background: #171a29;
+    }
+
+    /* 已选图片后：边框变实线金色，提示已就绪 */
+    .form .photo-pick.has-file {
+      border-style: solid;
+      border-color: #f5c542;
+    }
+
+    .form .photo-prev {
+      width: 34px;
+      height: 34px;
+      flex: 0 0 auto;
+      object-fit: cover;
+      object-position: center;
+      border-radius: 4px;
+      background: #0e1018;
+    }
+
+    .form .pick-hint {
+      font-size: 13px;
+      color: #8b93b3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      min-width: 0;
+      position: relative;
+      top: -2px;
+    }
+
+    .form .photo-pick.has-file .pick-hint {
+      color: #f5c542;
+    }
+
+    .form #btnAdd,
+    .form #btnCancel {
+      flex: 0 0 auto;
+      height: 43px;
+      padding: 0 16px;
+      box-sizing: border-box;
+    }
+
+    /* 确定按钮靠表单右下角，与照片框严格等高 */
+    .form #btnAdd {
+      margin-left: auto;
+      align-self: stretch;
+      height: 44px;
+    }
+
+    /* 手机窄屏：表单整体收紧 */
+    @media (max-width: 480px) {
+      .form {
+        padding: 10px;
+        gap: 8px;
+      }
+      .form input {
+        padding: 7px 9px;
+        font-size: 13px;
+      }
+      .form button {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
     }
 
     .form button {
@@ -224,6 +329,138 @@
       font-size: 10px;
       font-weight: normal;
       opacity: 0.85;
+    }
+
+    /* 排序 + 视图切换：同一行，视图切换靠右 */
+    .bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 6px;
+      width: 100%;
+      max-width: 660px;
+      margin-bottom: 10px;
+      box-sizing: border-box;
+    }
+
+    .bar .sort {
+      display: flex;
+      gap: 4px;
+      min-width: 0;
+      margin-bottom: 0;
+    }
+
+    .bar .sort button {
+      min-width: 0;
+    }
+
+    .bar .viewswitch {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+    }
+
+    /* 列表 / 图片 视图切换 */
+    .viewswitch {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* 这一行按钮较多，统一收紧内边距，保证任何宽度都能同行放下 */
+    .bar .sort button,
+    .bar .viewswitch button {
+      padding: 4px 6px;
+      font-size: 11px;
+    }
+
+    /* 中文在按钮框里视觉上偏低：下内边距多 1px，把文字往上顶 */
+    .bar .viewswitch button,
+    .bar .sort button {
+      padding: 3px 6px 5px;
+    }
+
+    .bar .sort,
+    .bar .viewswitch {
+      gap: 4px;
+    }
+
+    .viewswitch button {
+      background: #1f2233;
+      border: 1px solid #333a55;
+      color: #9aa3c0;
+      border-radius: 6px;
+      padding: 6px 14px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .viewswitch button.on {
+      color: #f5c542;
+      border-color: #f5c542;
+    }
+
+    .viewswitch button:hover {
+      transform: translateY(-2px);
+      border-color: #f5c542;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 图片墙：只显示照片，无文字 */
+    .list.picmode {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    /* 手机窄屏：间距再收一点，避免 5 张挤在一起 */
+    @media (max-width: 480px) {
+      .list.picmode {
+        gap: 5px;
+      }
+      .list.picmode .card .photo {
+        border-radius: 6px;
+      }
+    }
+
+    .list.picmode .card {
+      min-width: 0;
+      width: 100%;
+      padding: 0;
+      background: transparent;
+      border: none;
+      border-radius: 10px;
+      display: block;
+      overflow: hidden;
+    }
+
+    .list.picmode .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+      border: none;
+    }
+
+    .list.picmode .card .photo {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+      border-radius: 10px;
+      border: 1px solid #333a55;
+    }
+
+    .list.picmode .card .photo img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .list.picmode .card .info,
+    .list.picmode .card .edit,
+    .list.picmode .card .del,
+    .list.picmode .card .save,
+    .list.picmode .card .cancel {
+      display: none;
     }
 
     .sort {
@@ -713,7 +950,6 @@
     </div>
     <span class="title-text">阿琦的乐高忍者收藏册</span>
   </h1>
-  <div class="sub">幻影旋转!</div>
   <div class="stats" id="stats">共 0 个人仔</div>
 
   <div class="form">
@@ -721,11 +957,14 @@
     <input class="no" id="inNo" placeholder="编号（如 njo001）">
     <input class="price" id="inPrice" type="number" step="0.01" min="0" placeholder="购入价（元）">
     <input class="note" id="inNote" placeholder="备注（可选）">
-    <div class="photo-wrap">
-      <input type="file" id="inPhoto" accept="image/*">
-      <span>（可选）上传人仔照片，会自动压缩</span>
+    <div class="photo-row">
+      <label class="photo-pick" id="photoPick">
+        <input type="file" id="inPhoto" accept="image/*" hidden>
+        <img id="photoPreview" class="photo-prev" alt="" hidden>
+        <span class="pick-hint" id="pickHint">＋ 添加照片</span>
+      </label>
+      <button id="btnAdd">确定</button>
     </div>
-    <button id="btnAdd">＋ 添加</button>
     <button id="btnCancel" style="display:none">取消</button>
   </div>
 
@@ -740,10 +979,16 @@
     <button data-role="吴">吴 Wu<span class="cnt"></span></button>
     <button data-role="其他">其他<span class="cnt"></span></button>
   </div>
-  <div class="sort">
-    <button data-sort="default" class="on">默认</button>
-    <button data-sort="asc">编号 ↑</button>
-    <button data-sort="desc">编号 ↓</button>
+  <div class="bar">
+    <div class="sort">
+      <button data-sort="default" class="on">默认</button>
+      <button data-sort="asc">编号 ↑</button>
+      <button data-sort="desc">编号 ↓</button>
+    </div>
+    <div class="viewswitch">
+      <button data-view="list" class="on">列表</button>
+      <button data-view="grid">图片</button>
+    </div>
   </div>
   <input class="search" id="inSearch" placeholder="🔍 搜索名字或备注…">
 
@@ -813,6 +1058,7 @@
       });
     }
     let sortMode = 'default';// 排序方式：default / asc / desc
+    let viewMode = 'list';   // 视图方式：list 列表 / grid 图片墙
     let editingId = null;   // 正在编辑的人仔 id，null 表示"添加模式"
     let activeRole = '';   // 当前选中的角色，空 = 全部
     const mainRoles = ['杰', '凯', '赞', '寇', '劳埃德', '妮娅', '吴'];  // 主角团（用来算"其他"）
@@ -838,6 +1084,35 @@
     const inPrice = document.getElementById('inPrice');
     const inNote = document.getElementById('inNote');
     const inPhoto = document.getElementById('inPhoto');
+    const photoPreview = document.getElementById('photoPreview');
+    const pickHint = document.getElementById('pickHint');
+    const photoPick = document.getElementById('photoPick');
+
+    // 选图后：显示缩略图 + 文件名
+    inPhoto.addEventListener('change', () => {
+      const f = inPhoto.files && inPhoto.files[0];
+      if (!f) return;
+      if (photoPreview.dataset.url) URL.revokeObjectURL(photoPreview.dataset.url);
+      const url = URL.createObjectURL(f);
+      photoPreview.dataset.url = url;
+      photoPreview.src = url;
+      photoPreview.hidden = false;
+      pickHint.textContent = f.name;
+      photoPick.classList.add('has-file');
+    });
+
+    // 添加完成 / 取消后恢复成「＋ 添加照片」
+    function resetPhotoPick() {
+      if (photoPreview.dataset.url) {
+        URL.revokeObjectURL(photoPreview.dataset.url);
+        delete photoPreview.dataset.url;
+      }
+      photoPreview.removeAttribute('src');
+      photoPreview.hidden = true;
+      pickHint.textContent = '＋ 添加照片';
+      photoPick.classList.remove('has-file');
+      inPhoto.value = '';
+    }
     const inNo = document.getElementById('inNo');
     const inSearch = document.getElementById('inSearch');
     const btnAdd = document.getElementById('btnAdd');
@@ -1039,6 +1314,7 @@ function compressOriginal(img, callback) {
       });
     }
     function render() {
+      listEl.classList.toggle('picmode', viewMode === 'grid');
       const kw = inSearch.value.trim().toLowerCase();
       let filtered = figs.filter(f =>
         (String(f.name || '') + ' ' + String(f.note || '')).toLowerCase().includes(kw)
@@ -1118,7 +1394,8 @@ function compressOriginal(img, callback) {
       figs.push(fig);
       save();
       render();
-      inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = ''; inPhoto.value = '';
+      inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = '';
+      resetPhotoPick();
       // 定位到刚添加的人仔并高亮
       const newCard = document.querySelector('.card[data-id="' + fig.id + '"]');
       if (newCard) {
@@ -1295,9 +1572,10 @@ function compressOriginal(img, callback) {
     });
     btnCancel.addEventListener('click', () => {
       editingId = null;
-      btnAdd.textContent = '＋ 添加';
+      btnAdd.textContent = '确定';
       btnCancel.style.display = 'none';
-      inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = ''; inPhoto.value = '';
+      inName.value = ''; inNo.value = ''; inPrice.value = ''; inNote.value = '';
+      resetPhotoPick();
     });
     // 点弹窗背景或"关闭"按钮 -> 关掉大图
     lightbox.addEventListener('click', (e) => {
@@ -1320,6 +1598,16 @@ function compressOriginal(img, callback) {
       btn.addEventListener('click', () => {
         sortMode = btn.dataset.sort;
         document.querySelectorAll('.sort button').forEach(b => b.classList.remove('on'));
+        btn.classList.add('on');
+        render();
+      });
+    });
+
+    // 视图切换：列表 / 图片墙
+    document.querySelectorAll('.viewswitch button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        viewMode = btn.dataset.view;
+        document.querySelectorAll('.viewswitch button').forEach(b => b.classList.remove('on'));
         btn.classList.add('on');
         render();
       });
