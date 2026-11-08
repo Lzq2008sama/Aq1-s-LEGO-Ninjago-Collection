@@ -332,15 +332,21 @@
     }
 
     /* 排序 + 视图切换：同一行，视图切换靠右 */
+    /* 排序 + 视图切换：5 个按钮统一装进一个大框 */
     .bar {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
+      display: flex;
+      justify-content: space-between;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       width: 100%;
       max-width: 660px;
       margin-bottom: 10px;
       box-sizing: border-box;
+      background: #161925;
+      border: 1px solid #2c3248;
+      border-radius: 10px;
+      padding: 5px 6px;
+      overflow: hidden;
     }
 
     .bar .sort {
@@ -348,6 +354,8 @@
       gap: 4px;
       min-width: 0;
       margin-bottom: 0;
+      width: auto;       /* 覆盖 .sort 的 width:100%，否则会撑满整行 */
+      max-width: none;
     }
 
     .bar .sort button {
@@ -370,24 +378,25 @@
     /* 这一行按钮较多，统一收紧内边距，保证任何宽度都能同行放下 */
     .bar .sort button,
     .bar .viewswitch button {
-      padding: 4px 6px;
-      font-size: 11px;
-    }
-
-    /* 中文在按钮框里视觉上偏低：下内边距多 1px，把文字往上顶 */
-    .bar .viewswitch button,
-
-    .bar .sort,
-
-    .viewswitch button {
       background: #1f2233;
       border: 1px solid #333a55;
       color: #9aa3c0;
       border-radius: 6px;
-      padding: 6px 14px;
+      padding: 4px 8px;
+      font-size: 11px;
       cursor: pointer;
-      font-size: 13px;
+      min-width: 0;
+      line-height: 1.4;
+      white-space: nowrap;   /* 中文两个字的按钮不许折行 */
+      flex-shrink: 0;
     }
+
+    .bar .sort,
+    .bar .viewswitch {
+      flex-shrink: 0;
+    }
+
+    /* 中文在按钮框里视觉上偏低：下内边距多 1px，把文字往上顶 */
 
     .viewswitch button.on {
       color: #f5c542;
@@ -994,7 +1003,8 @@
       align-items: center;
       justify-content: center;
       gap: 12px;
-      z-index: 1000;
+      /* 必须高于 .fig-sheet(9999)，否则会被编辑弹窗盖住看不见 */
+      z-index: 10000;
       touch-action: none;
     }
 
@@ -1147,12 +1157,6 @@
       }
     }
 
-    /* 悬停时停止闪烁并定格在亮色，暗示可点击 */
-    .edit-card .edit-photo-pick:hover .sheet-ring {
-      animation: none;
-      border-color: #f5c542;
-      opacity: 1;
-    }
     .edit-card .sheet-ring img { border-radius: 13px; background: #0f1118; }
 
     /* 左上角的「编辑」标签 */
@@ -1178,10 +1182,36 @@
       .edit-card .edit-actions { margin-top: 12px; }
       .edit-card .edit-actions button { height: 36px; font-size: 12.5px; }
     }
-    .edit-photo-pick { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+    .sheet-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .edit-photo-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .edit-photo-btn {
+      background: #262b40;
+      border: 1px solid #3d4460;
+      color: #cfd6ea;
+      border-radius: 7px;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: border-color .15s, color .15s;
+    }
+
+    .edit-photo-btn:hover {
+      border-color: #f5c542;
+      color: #f5c542;
+    }
     .edit-ring { cursor: pointer; transition: transform .15s; }
     .edit-ring:hover { transform: scale(1.03); }
-    .edit-photo-hint { font-size: 11px; color: #8b93b3; letter-spacing: .5px; }
     .edit-field { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .edit-field .k { width: 46px; flex-shrink: 0; font-size: 12px; color: #8b93b3; }
     .edit-field input { flex: 1; min-width: 0; background: #12141f; border: 1px solid #333a55; border-radius: 6px; padding: 8px 10px; color: #e6e9f5; font-size: 13px; outline: none; }
@@ -1342,10 +1372,11 @@
       <div class="edit-label">编辑</div>
       <button class="sheet-close" id="editClose" aria-label="关闭">✕</button>
       <div class="sheet-left">
-        <label class="edit-photo-pick" for="editPhotoInput">
-          <div class="sheet-ring edit-ring"><img id="editPhoto" src="" alt=""></div>
-          <span class="edit-photo-hint">点击换图</span>
-        </label>
+        <div class="sheet-ring edit-ring"><img id="editPhoto" src="" alt=""></div>
+        <div class="edit-photo-actions">
+          <button type="button" class="edit-photo-btn" id="editChangePhoto">换一张</button>
+          <button type="button" class="edit-photo-btn" id="editRecropPhoto">调整大小</button>
+        </div>
         <input type="file" id="editPhotoInput" accept="image/*" hidden>
       </div>
       <div class="sheet-right">
@@ -1473,11 +1504,15 @@
     const cropCanvas = document.getElementById('cropCanvas');
     const cropCtx = cropCanvas.getContext('2d');
 
+    // 保险：把裁剪器移到 body 末尾，保证 DOM 顺序最靠后，不会被任何弹窗盖住
+    document.body.appendChild(cropper);
+
     // 打开裁剪器：图片短边填满裁剪框
     function openCropper(img, callback) {
       cropImg = img;
       cropCallback = callback;
-      cropScale = 300 / Math.min(img.width, img.height);
+      // 初始按「整张图完整显示」放进裁剪框（contain），用户可以放大去裁
+      cropScale = Math.min(300 / img.width, 300 / img.height);
       const dw = img.width * cropScale;
       const dh = img.height * cropScale;
       cropOffsetX = (300 - dw) / 2;
@@ -1833,20 +1868,6 @@ function compressOriginal(img, callback) {
       disarmDelete();
 
       // 点编辑态照片 -> 重新裁剪
-      const editPhoto = e.target.closest('.edit-photo-preview');
-      if (editPhoto) {
-        const fig = figs.find(f => f.id === Number(editPhoto.dataset.id));
-        if (fig && fig.photo) {
-          const img = new Image();
-          img.onload = () => openCropper(img, (dataUrl) => {
-            pendingPhoto = dataUrl;
-            editPhoto.innerHTML = '<img src="' + dataUrl + '" alt="">';
-          });
-          img.src = fig.photoOriginal || fig.photo;
-        }
-        return;
-      }
-
       // 点"编辑" -> 进入行内编辑
       const editBtn = e.target.closest('.edit');
       if (editBtn) {
@@ -1938,7 +1959,8 @@ function compressOriginal(img, callback) {
       if (!f) return;
       editingFigId = f.id;
       pendingPhoto = null;
-      pendingOriginal = null;
+      // 把已存的原图读回来，这样只调大小、不换图时，原图不会被 null 覆盖
+      pendingOriginal = f.photoOriginal || null;
       document.getElementById('edName').value = f.name || '';
       document.getElementById('edNo').value = f.no || '';
       document.getElementById('edPrice').value = f.price || '';
@@ -2079,6 +2101,32 @@ function compressOriginal(img, callback) {
         showSaveToast();
       });
 
+      // 「换一张」→ 打开文件选择
+      document.getElementById('editChangePhoto').addEventListener('click', () => {
+        document.getElementById('editPhotoInput').click();
+      });
+
+      // 「调整大小」→ 拿当前头像重新进裁剪
+      document.getElementById('editRecropPhoto').addEventListener('click', () => {
+        const cur = document.getElementById('editPhoto');
+        if (!cur.src || cur.src === window.location.href) return;
+        // 优先用未裁剪的原图，避免反复裁剪导致画面越来越糊
+        const editingFig = figs.find(x => x.id === Number(editingFigId));
+        const srcToCrop = (editingFig && editingFig.photoOriginal) ? editingFig.photoOriginal : cur.src;
+        const img = new Image();
+        img.onload = () => {
+          openCropper(img, (dataUrl) => {
+            pendingPhoto = dataUrl;
+            // 注意：这里绝不动 pendingOriginal，否则原图会被清空，
+            // 导致「第二次调整大小」时找不到原图、退化成已裁剪的小图
+            const ph = document.getElementById('editPhoto');
+            ph.src = dataUrl;
+            ph.style.display = 'block';
+          });
+        };
+        img.src = srcToCrop;
+      });
+
       document.getElementById('editPhotoInput').addEventListener('change', (e) => {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
@@ -2086,12 +2134,15 @@ function compressOriginal(img, callback) {
         reader.onload = () => {
           const img = new Image();
           img.onload = () => {
-            openCropper(img, (dataUrl) => {
-              pendingPhoto = dataUrl;
-              pendingOriginal = '';
-              const ph = document.getElementById('editPhoto');
-              ph.src = dataUrl;
-              ph.style.display = 'block';
+            // 换新图时，把这张图的「未裁剪原图」存起来，供以后反复调整大小
+            compressOriginal(img, (original) => {
+              pendingOriginal = original;
+              openCropper(img, (dataUrl) => {
+                pendingPhoto = dataUrl;
+                const ph = document.getElementById('editPhoto');
+                ph.src = dataUrl;
+                ph.style.display = 'block';
+              });
             });
           };
           img.src = reader.result;
