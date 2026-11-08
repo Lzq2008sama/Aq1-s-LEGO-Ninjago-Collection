@@ -352,6 +352,7 @@
 
     .bar .sort button {
       min-width: 0;
+      padding: 3px 6px 5px;
     }
 
     .bar .viewswitch {
@@ -375,14 +376,8 @@
 
     /* 中文在按钮框里视觉上偏低：下内边距多 1px，把文字往上顶 */
     .bar .viewswitch button,
-    .bar .sort button {
-      padding: 3px 6px 5px;
-    }
 
     .bar .sort,
-    .bar .viewswitch {
-      gap: 4px;
-    }
 
     .viewswitch button {
       background: #1f2233;
@@ -419,8 +414,11 @@
       .list.picmode {
         gap: 5px;
       }
-      .list.picmode .card .photo {
-        border-radius: 6px;
+      .list.picmode .card .info {
+        margin-top: 4px;
+      }
+      .list.picmode .card .info .n {
+        font-size: 10px;
       }
     }
 
@@ -430,9 +428,10 @@
       padding: 0;
       background: transparent;
       border: none;
-      border-radius: 10px;
+      /* 直角：圆角会把下方长名字的首尾切掉 */
+      border-radius: 0;
       display: block;
-      overflow: hidden;
+      overflow: visible;
     }
 
     .list.picmode .card:hover {
@@ -445,21 +444,48 @@
       width: 100%;
       height: auto;
       aspect-ratio: 1 / 1;
-      border-radius: 10px;
-      border: 1px solid #333a55;
+      border-radius: 50%;
+      border: 2px solid #333a55;
+      box-sizing: border-box;
+      transition: border-color .15s, box-shadow .15s;
     }
 
     .list.picmode .card .photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
+      border-radius: 50%;
     }
 
-    .list.picmode .card .info,
+    /* 悬停：头像描金，像游戏里被选中的角色 */
+    .list.picmode .card:hover .photo {
+      border-color: #f5c542;
+      box-shadow: 0 0 0 2px rgba(245, 197, 66, .28);
+    }
+
+    /* 只保留名字，其余信息隐藏 */
+    .list.picmode .card .info {
+      display: block;
+      margin-top: 5px;
+      text-align: center;
+      min-width: 0;
+    }
+
+    .list.picmode .card .info .n {
+      font-size: 11px;
+      line-height: 1.3;
+      color: #9aa3c0;
+      font-weight: 400;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list.picmode .card .info .no-tag,
+    .list.picmode .card .info .s,
+    .list.picmode .card .info .p,
     .list.picmode .card .edit,
-    .list.picmode .card .del,
-    .list.picmode .card .save,
-    .list.picmode .card .cancel {
+    .list.picmode .card .del {
       display: none;
     }
 
@@ -593,6 +619,10 @@
       margin-top: 3px;
     }
 
+
+
+
+
     .card .info .p {
       font-size: 14px;
       color: #f5c542;
@@ -602,45 +632,10 @@
 
 
 
-    .card.editing {
-      flex-wrap: wrap;
-    }
 
-    .card.editing .info input {
-      display: block;
-      width: 100%;
-      margin-bottom: 6px;
-      background: #12141f;
-      border: 1px solid #333a55;
-      color: #eee;
-      border-radius: 6px;
-      padding: 8px 10px;
-      font-size: 14px;
-      outline: none;
-    }
 
-    .card .save {
-      background: #f5c542;
-      color: #1a1a1a;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: bold;
-    }
 
-    .edit-photo-preview { cursor: pointer; }
 
-    .card .cancel {
-      background: none;
-      border: 1px solid #666;
-      color: #ccc;
-      border-radius: 6px;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-size: 13px;
-    }
 
     .card .edit {
       background: none;
@@ -768,6 +763,184 @@
       border-radius: 6px;
       cursor: pointer;
       font-size: 14px;
+    }
+
+    /* ===== 图片模式：角色详情面板 ===== */
+    .fig-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      box-sizing: border-box;
+      background: radial-gradient(circle at 50% 40%, rgba(28, 32, 52, .92), rgba(8, 9, 15, .96));
+      backdrop-filter: blur(6px);
+    }
+
+    .sheet-card {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 22px;
+      width: 100%;
+      max-width: 520px;
+      padding: 22px 24px;
+      box-sizing: border-box;
+      background: linear-gradient(160deg, #1b1f30 0%, #141726 100%);
+      border: 1px solid rgba(245, 197, 66, .35);
+      border-radius: 16px;
+      box-shadow: 0 0 0 1px rgba(245, 197, 66, .08), 0 18px 48px rgba(0, 0, 0, .6);
+      animation: sheetIn .22s ease-out;
+    }
+
+    @keyframes sheetIn {
+      from { opacity: 0; transform: translateY(14px) scale(.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .sheet-close {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 30px;
+      height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: 1px solid #333a55;
+      border-radius: 8px;
+      color: #8b93b3;
+      font-size: 14px;
+      cursor: pointer;
+      transition: color .15s, border-color .15s;
+    }
+
+    .sheet-close:hover {
+      color: #f5c542;
+      border-color: #f5c542;
+    }
+
+    /* 左侧：圆形头像 + 金色光环 */
+    .sheet-left {
+      flex: 0 0 auto;
+    }
+
+    .sheet-ring {
+      width: 168px;
+      height: 168px;
+      padding: 4px;
+      border-radius: 50%;
+      background: conic-gradient(from 210deg, #f5c542, #8a6206 35%, #f5c542 60%, #d09a12 85%, #f5c542);
+      box-shadow: 0 0 26px rgba(245, 197, 66, .38);
+      box-sizing: border-box;
+    }
+
+    .sheet-ring img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      background: #0f1118;
+    }
+
+    /* 右侧：信息 */
+    .sheet-right {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .sheet-name {
+      font-size: 21px;
+      font-weight: 800;
+      line-height: 1.2;
+      letter-spacing: .5px;
+      background: linear-gradient(180deg, #fff6cc, #f5c542 55%, #c9931a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      -webkit-text-fill-color: transparent;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sheet-no {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 2px 9px;
+      font-size: 11px;
+      letter-spacing: .5px;
+      color: #9aa3c0;
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid #333a55;
+      border-radius: 999px;
+    }
+
+    .sheet-divider {
+      height: 1px;
+      margin: 11px 0 9px;
+      background: linear-gradient(90deg, rgba(245, 197, 66, .45), rgba(245, 197, 66, 0));
+    }
+
+    .sheet-row {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .sheet-row .k {
+      flex: 0 0 46px;
+      color: #7c84a3;
+      letter-spacing: .5px;
+      font-size: 11px;
+    }
+
+    .sheet-row .v {
+      flex: 1 1 auto;
+      min-width: 0;
+      color: #d7dcec;
+      word-break: break-word;
+    }
+
+    .sheet-row .v.gold {
+      color: #f5c542;
+      font-weight: 700;
+    }
+
+    /* 手机上改为竖排 */
+    @media (max-width: 480px) {
+      .sheet-card {
+        flex-direction: column;
+        gap: 14px;
+        padding: 20px 18px 18px;
+      }
+      .sheet-ring {
+        width: 148px;
+        height: 148px;
+      }
+      .sheet-right {
+        width: 100%;
+      }
+      .sheet-name {
+        font-size: 18px;
+        text-align: center;
+      }
+      .sheet-no {
+        display: block;
+        margin: 5px auto 0;
+        text-align: center;
+        width: fit-content;
+      }
+      .sheet-divider {
+        margin: 10px 0 8px;
+      }
     }
 
     .backup {
@@ -940,7 +1113,124 @@
 
     }
     }
-  </style>
+  
+    /* ===== 编辑弹窗 ===== */
+    .edit-card { max-width: 620px; }
+    @media (max-width: 600px) {
+      .edit-card {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 14px;
+        padding: 18px 16px 16px;
+        max-width: 92vw;
+      }
+      .edit-card .sheet-left { align-self: center; }
+      .edit-card .sheet-ring {
+      width: 116px; height: 116px;
+      border-radius: 16px;
+      /* 待编辑状态：去掉金色光环，改用加粗的灰色虚线框 + 呼吸闪烁 */
+      background: none;
+      box-shadow: none;
+      padding: 0;
+      border: 3px dashed #5a6386;
+      animation: dashPulse 1.9s ease-in-out infinite;
+    }
+
+    @keyframes dashPulse {
+      0%, 100% {
+        border-color: #4a5270;
+        opacity: .78;
+      }
+      50% {
+        border-color: #98a3c9;
+        opacity: 1;
+      }
+    }
+
+    /* 悬停时停止闪烁并定格在亮色，暗示可点击 */
+    .edit-card .edit-photo-pick:hover .sheet-ring {
+      animation: none;
+      border-color: #f5c542;
+      opacity: 1;
+    }
+    .edit-card .sheet-ring img { border-radius: 13px; background: #0f1118; }
+
+    /* 左上角的「编辑」标签 */
+    .edit-label {
+      position: absolute;
+      top: 14px;
+      left: 18px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: #cfd6ea;
+      background: #262b40;
+      border: 1px solid #3d4460;
+      border-radius: 5px;
+      /* 上 3.5 / 下 2.5：文字再下移 0.5px；左 11 / 右 8：保持上次右移 */
+      padding: 3.5px 8px 2.5px 11px;
+      line-height: 1.4;
+    }
+      .edit-card .sheet-name { text-align: center; font-size: 17px; }
+      .edit-card .sheet-divider { margin: 9px 0 9px; }
+      .edit-card .edit-field .k { width: 42px; font-size: 11px; }
+      .edit-card .edit-field input { padding: 7px 9px; font-size: 12.5px; }
+      .edit-card .edit-actions { margin-top: 12px; }
+      .edit-card .edit-actions button { height: 36px; font-size: 12.5px; }
+    }
+    .edit-photo-pick { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; }
+    .edit-ring { cursor: pointer; transition: transform .15s; }
+    .edit-ring:hover { transform: scale(1.03); }
+    .edit-photo-hint { font-size: 11px; color: #8b93b3; letter-spacing: .5px; }
+    .edit-field { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .edit-field .k { width: 46px; flex-shrink: 0; font-size: 12px; color: #8b93b3; }
+    .edit-field input { flex: 1; min-width: 0; background: #12141f; border: 1px solid #333a55; border-radius: 6px; padding: 8px 10px; color: #e6e9f5; font-size: 13px; outline: none; }
+    .edit-field input:focus { border-color: #f5c542; }
+    .edit-actions { display: flex; gap: 10px; margin-top: 16px; }
+    .edit-actions button { flex: 1; height: 38px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
+    .edit-save { background: #f5c542; color: #1a1d2b; border: none; }
+    .edit-cancel { background: transparent; color: #9aa3c0; border: 1px solid #3d4460; }
+
+  
+    /* 保存成功小提示：居中弹出，1 秒后降低透明度淡出（无缩放） */
+    .save-toast {
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 12px;
+      background: rgba(38, 43, 64, .97);
+      border-radius: 9px;
+      color: #ffffff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: .3px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, .5);
+      opacity: 0;
+      transform: translate(-50%, -50%);
+      transition: opacity .55s ease;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .save-toast.show {
+      opacity: 1;
+    }
+
+    .save-toast svg {
+      width: 14px;
+      height: 14px;
+      flex: 0 0 auto;
+      fill: none;
+      stroke: #22c55e;
+      stroke-width: 3.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+</style>
 </head>
 <body>
   <h1>
@@ -1020,10 +1310,68 @@
     </div>
   </div>
 
+  <!-- 图片模式：点角色头像弹出的详情面板 -->
+  <div class="fig-sheet" id="figSheet" style="display:none">
+    <div class="sheet-card">
+      <button class="sheet-close" id="sheetClose" aria-label="关闭">✕</button>
+      <div class="sheet-left">
+        <div class="sheet-ring">
+          <img id="sheetPhoto" src="" alt="">
+        </div>
+      </div>
+      <div class="sheet-right">
+        <div class="sheet-name" id="sheetName"></div>
+        <div class="sheet-no" id="sheetNo"></div>
+        <div class="sheet-divider"></div>
+        <div class="sheet-row">
+          <span class="k">备注</span>
+          <span class="v" id="sheetNote"></span>
+        </div>
+        <div class="sheet-row">
+          <span class="k">购入价</span>
+          <span class="v gold" id="sheetPrice"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- 编辑弹窗 -->
+  <div class="fig-sheet" id="editSheet" style="display:none">
+    <div class="sheet-card edit-card">
+      <div class="edit-label">编辑</div>
+      <button class="sheet-close" id="editClose" aria-label="关闭">✕</button>
+      <div class="sheet-left">
+        <label class="edit-photo-pick" for="editPhotoInput">
+          <div class="sheet-ring edit-ring"><img id="editPhoto" src="" alt=""></div>
+          <span class="edit-photo-hint">点击换图</span>
+        </label>
+        <input type="file" id="editPhotoInput" accept="image/*" hidden>
+      </div>
+      <div class="sheet-right">
+        <div class="sheet-divider"></div>
+        <label class="edit-field"><span class="k">名字</span><input id="edName" type="text" placeholder="名字"></label>
+        <label class="edit-field"><span class="k">编号</span><input id="edNo" type="text" placeholder="编号"></label>
+        <label class="edit-field"><span class="k">购入价</span><input id="edPrice" type="number" placeholder="价格"></label>
+        <label class="edit-field"><span class="k">备注</span><input id="edNote" type="text" placeholder="备注"></label>
+        <div class="edit-actions">
+          <button class="edit-cancel" id="editCancel">取消</button>
+          <button class="edit-save" id="editSave">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- 删除后弹出的撤销提示 -->
   <div id="undoBar" class="undo-bar">
     <span id="undoText"></span>
     <button id="undoBtn">撤销</button>
+  </div>
+
+  <!-- 保存成功提示 -->
+  <div class="save-toast" id="saveToast">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13l4 4L19 7"/></svg>
+    <span>保存成功</span>
   </div>
 
 
@@ -1343,22 +1691,6 @@ function compressOriginal(img, callback) {
       }
 
       listEl.innerHTML = filtered.map(f => {
-        // 正在编辑的这条 -> 原地展开成输入框
-        if (f.id === editingId) {
-          return `
-            <div class="card editing">
-              <div class="photo edit-photo-preview" data-id="${f.id}" title="点击重新裁剪">${f.photo ? '<img src="' + f.photo + '" alt="">' : '无图'}</div>
-              <div class="info">
-                <input class="edit-name" value="${escapeHtml(f.name)}" placeholder="名字">
-                <input class="edit-no" value="${escapeHtml(f.no || '')}" placeholder="编号">
-                <input class="edit-price" value="${f.price || ''}" placeholder="价格">
-                <input class="edit-note" value="${escapeHtml(f.note || '')}" placeholder="备注">
-                <label class="edit-photo-label">换图：<input type="file" class="edit-photo" accept="image/*"></label>
-              </div>
-              <button class="save" data-id="${f.id}">保存</button>
-              <button class="cancel">取消</button>
-            </div>`;
-        }
         const priceHtml = f.price ? '<div class="p">购入价 ¥' + Number(f.price).toFixed(2) + '</div>' : '';
         const photoHtml = f.photo
           ? '<div class="photo"><img src="' + f.photo + '" alt="" loading="lazy"></div>'
@@ -1368,7 +1700,9 @@ function compressOriginal(img, callback) {
             ${photoHtml}
             <div class="info">
               <div class="n">${escapeHtml(f.name)}${f.no ? ' <span class="no-tag">' + escapeHtml(f.no) + '</span>' : ''}</div>
-              <div class="s">${escapeHtml(f.note || '—')}</div>
+              ${f.note
+                ? '<div class="s">' + escapeHtml(f.note) + '</div>'
+                : '<div class="s">—</div>'}
               ${priceHtml}
             </div>
             <button class="edit" data-id="${f.id}">编辑</button>
@@ -1516,10 +1850,7 @@ function compressOriginal(img, callback) {
       // 点"编辑" -> 进入行内编辑
       const editBtn = e.target.closest('.edit');
       if (editBtn) {
-        editingId = Number(editBtn.dataset.id);
-        pendingPhoto = null;
-        pendingOriginal = null;
-        render();
+        openEditSheet(editBtn.dataset.id);
         return;
       }
       // 点"保存" -> 读取输入框，更新这条记录
@@ -1553,11 +1884,16 @@ function compressOriginal(img, callback) {
         render();
         return;
       }
-      // 点缩略图 -> 放大查看
+      // 点缩略图 -> 图片模式打开角色详情，列表模式放大看图
       const img = e.target.closest('.photo img');
       if (img) {
-        lightboxImg.src = img.src;
-        lightbox.style.display = 'flex';
+        const card = img.closest('.card');
+        if (viewMode === 'grid' && card) {
+          openFigSheet(card.dataset.id);
+        } else {
+          lightboxImg.src = img.src;
+          lightbox.style.display = 'flex';
+        }
       }
 
 
@@ -1581,6 +1917,75 @@ function compressOriginal(img, callback) {
     lightbox.addEventListener('click', (e) => {
       if (e.target === lightbox || e.target === lightboxClose) {
         lightbox.style.display = 'none';
+      }
+    });
+
+    // ========== 角色详情面板（图片模式）==========
+    const figSheet = document.getElementById('figSheet');
+    const sheetClose = document.getElementById('sheetClose');
+    const sheetPhoto = document.getElementById('sheetPhoto');
+    const sheetName = document.getElementById('sheetName');
+    const sheetNo = document.getElementById('sheetNo');
+    const sheetNote = document.getElementById('sheetNote');
+    const sheetPrice = document.getElementById('sheetPrice');
+
+
+    // ===== 编辑弹窗 =====
+    let editingFigId = null;
+
+    function openEditSheet(id) {
+      const f = figs.find(x => x.id === Number(id));
+      if (!f) return;
+      editingFigId = f.id;
+      pendingPhoto = null;
+      pendingOriginal = null;
+      document.getElementById('edName').value = f.name || '';
+      document.getElementById('edNo').value = f.no || '';
+      document.getElementById('edPrice').value = f.price || '';
+      document.getElementById('edNote').value = f.note || '';
+      const ph = document.getElementById('editPhoto');
+      if (f.photo) { ph.src = f.photo; ph.style.display = 'block'; }
+      else { ph.removeAttribute('src'); ph.style.display = 'none'; }
+      document.getElementById('editSheet').style.display = 'flex';
+    }
+
+    function closeEditSheet() {
+      document.getElementById('editSheet').style.display = 'none';
+      editingFigId = null;
+      pendingPhoto = null;
+      pendingOriginal = null;
+    }
+
+    function openFigSheet(id) {
+      const f = figs.find(x => String(x.id) === String(id));
+      if (!f) return;
+      if (f.photo) {
+        sheetPhoto.src = f.photo;
+        sheetPhoto.style.display = 'block';
+      } else {
+        sheetPhoto.removeAttribute('src');
+        sheetPhoto.style.display = 'none';
+      }
+      sheetName.textContent = f.name || '未命名';
+      sheetNo.textContent = f.no ? String(f.no) : '未编号';
+      if (f.note) {
+        sheetNote.textContent = String(f.note);
+      } else {
+        sheetNote.textContent = '—';
+      }
+      sheetPrice.textContent = f.price ? '¥' + Number(f.price).toFixed(2) : '—';
+      figSheet.style.display = 'flex';
+    }
+
+    figSheet.addEventListener('click', (e) => {
+      if (e.target === figSheet || e.target === sheetClose) {
+        figSheet.style.display = 'none';
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && figSheet.style.display === 'flex') {
+        figSheet.style.display = 'none';
       }
     });
 
@@ -1633,7 +2038,69 @@ function compressOriginal(img, callback) {
       figs = data;
       render();
     });
-  </script>
+  
+    // ===== 编辑弹窗事件绑定 =====
+    (function () {
+      const sheet = document.getElementById('editSheet');
+      if (!sheet) return;
+      const close = () => closeEditSheet();
+
+      document.getElementById('editClose').addEventListener('click', close);
+      document.getElementById('editCancel').addEventListener('click', close);
+      sheet.addEventListener('click', (e) => { if (e.target === sheet) close(); });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && sheet.style.display === 'flex') close();
+      });
+
+      function showSaveToast() {
+      const t = document.getElementById('saveToast');
+      if (!t) return;
+      t.classList.add('show');
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => t.classList.remove('show'), 1000);
+    }
+
+    document.getElementById('editSave').addEventListener('click', () => {
+        const f = figs.find(x => x.id === editingFigId);
+        if (!f) return;
+        const nm = document.getElementById('edName').value.trim();
+        if (!nm) { alert('请先填写人仔名字哦～'); return; }
+        f.name = nm;
+        f.no = document.getElementById('edNo').value.trim();
+        f.price = parseFloat(document.getElementById('edPrice').value) || 0;
+        f.note = document.getElementById('edNote').value.trim();
+        if (pendingPhoto !== null) {
+          f.photo = pendingPhoto;
+          f.photoOriginal = pendingOriginal;
+        }
+        save();
+        render();
+        close();
+        showSaveToast();
+      });
+
+      document.getElementById('editPhotoInput').addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => {
+          const img = new Image();
+          img.onload = () => {
+            openCropper(img, (dataUrl) => {
+              pendingPhoto = dataUrl;
+              pendingOriginal = '';
+              const ph = document.getElementById('editPhoto');
+              ph.src = dataUrl;
+              ph.style.display = 'block';
+            });
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+      });
+    })();
+</script>
 </body>
 
 </html>
