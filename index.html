@@ -12,19 +12,19 @@
   <style>
   html, body { touch-action: manipulation; }
     html {
-      background: #151726;
+      background: #0b0f14;
     }
 
     body {
       margin: 0;
       min-height: 100vh;
-      background-image: url('ninja-bg.jpg');
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
+      /* 顶部极淡的冷光，避免整页死黑 */
+      background:
+        radial-gradient(ellipse 120% 70% at 50% 0%, #121b28 0%, #0b0f14 58%)
+        #0b0f14;
 
       font-family: "Microsoft YaHei", sans-serif;
-      color: #eee;
+      color: #e8eef5;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -33,7 +33,7 @@
     }
 
     h1 {
-      color: #f5c542;
+      color: #38bdf8;
       margin: 0 0 4px;
       font-size: 26px;
       display: flex;
@@ -58,16 +58,27 @@
       font-family: "Impact", "Haettenschweiler", "Arial Black",
                    "Microsoft YaHei", "PingFang SC", sans-serif;
       font-weight: 900;
-      font-size: 30px;
-      letter-spacing: 3px;
-      line-height: 1.2;
-      transform: skewX(-7deg);
-      background: linear-gradient(180deg, #fff8c9 0%, #f5c542 42%, #d09a12 76%, #8a6206 100%);
+      font-size: 31px;
+      letter-spacing: 4px;
+      line-height: 1.15;
+      /* 更陡的斜切 + 轻微纵向拉伸 = 机械速度感 */
+      transform: none;
+      /* 银色金属：顶部高光 → 中段灰白 → 底部深钢灰 */
+      background: linear-gradient(
+        180deg,
+        #ffffff 0%,
+        #dfe7f0 28%,
+        #98a6b8 55%,
+        #5a6675 78%,
+        #333c48 100%
+      );
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(2px 3px 0 #16151a) drop-shadow(0 0 9px rgba(245, 197, 66, 0.28));
+      filter:
+        drop-shadow(2px 3px 0 #0a0d12)
+        drop-shadow(0 0 14px rgba(56, 189, 248, 0.22));
       white-space: nowrap;
     }
 
@@ -75,22 +86,22 @@
     @media (max-width: 480px) {
       h1 .title-text {
         font-size: 21px;
-        letter-spacing: 1px;
-        transform: skewX(-6deg);
-        filter: drop-shadow(1px 2px 0 #16151a) drop-shadow(0 0 6px rgba(245, 197, 66, 0.25));
+        letter-spacing: 1.5px;
+        transform: none;
+        filter: drop-shadow(1px 2px 0 #0a0d12) drop-shadow(0 0 8px rgba(56, 189, 248, 0.2));
       }
     }
 
     .stats {
-      color: #34d399;
+      color: #e2c07a;
       font-size: 15px;
       margin-bottom: 13px;
       font-weight: bold;
     }
 
     .form {
-      background: #1f2233;
-      border: 1px solid #333a55;
+      background: #131920;
+      border: 1px solid #25303d;
       border-radius: 10px;
       padding: 16px;
       width: 100%;
@@ -105,9 +116,9 @@
     }
 
     .form input {
-      background: #12141f;
-      border: 1px solid #333a55;
-      color: #eee;
+      background: #1a222c;
+      border: 1px solid #25303d;
+      color: #e8eef5;
       border-radius: 6px;
       padding: 9px 12px;
       font-size: 14px;
@@ -117,7 +128,7 @@
     }
 
     .form input:focus {
-      border-color: #f5c542;
+      border-color: #38bdf8;
     }
 
     /* 四个输入框：两两一行 */
@@ -148,9 +159,9 @@
       gap: 10px;
       padding: 0 10px;
       box-sizing: border-box;
-      border: 1px dashed #3d4460;
+      border: 1px dashed #334155;
       border-radius: 8px;
-      background: #12141f;
+      background: #1a222c;
       cursor: pointer;
       user-select: none;
       overflow: hidden;
@@ -158,14 +169,14 @@
     }
 
     .form .photo-pick:hover {
-      border-color: #f5c542;
+      border-color: #38bdf8;
       background: #171a29;
     }
 
     /* 已选图片后：边框变实线金色，提示已就绪 */
     .form .photo-pick.has-file {
       border-style: solid;
-      border-color: #f5c542;
+      border-color: #38bdf8;
     }
 
     .form .photo-prev {
@@ -180,7 +191,7 @@
 
     .form .pick-hint {
       font-size: 13px;
-      color: #8b93b3;
+      color: #7c8798;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -190,7 +201,7 @@
     }
 
     .form .photo-pick.has-file .pick-hint {
-      color: #f5c542;
+      color: #38bdf8;
     }
 
     .form #btnAdd,
@@ -204,8 +215,11 @@
     /* 确定按钮靠表单右下角，与照片框严格等高 */
     .form #btnAdd {
       margin-left: auto;
+      margin-right: 1px;
       align-self: stretch;
       height: 44px;
+      padding: 0 13px;
+      font-size: 13px;
     }
 
     /* 手机窄屏：表单整体收紧 */
@@ -225,18 +239,25 @@
     }
 
     .form button {
-      background: #f5c542;
-      color: #1a1a1a;
-      border: none;
+      background: #1d344f;
+      color: rgba(255, 255, 255, 0.62);
+      border: 1px solid #2f4d6e;
       border-radius: 6px;
       padding: 9px 18px;
       font-size: 14px;
-      font-weight: bold;
+      font-weight: 700;
+      letter-spacing: 0.5px;
       cursor: pointer;
+      transition: background .15s, border-color .15s;
     }
 
     .form button:hover {
-      background: #ffd764;
+      background: #27476b;
+      border-color: #3d6390;
+    }
+
+    .form button:active {
+      background: #16273c;
     }
 
 
@@ -246,7 +267,7 @@
     }
 
     .no-tag {
-      color: #34d399;
+      color: #818cf8;
       font-size: 12px;
       font-weight: normal;
       margin-left: 6px;
@@ -378,9 +399,9 @@
     /* 这一行按钮较多，统一收紧内边距，保证任何宽度都能同行放下 */
     .bar .sort button,
     .bar .viewswitch button {
-      background: #1f2233;
-      border: 1px solid #333a55;
-      color: #9aa3c0;
+      background: #131920;
+      border: 1px solid #25303d;
+      color: #94a3b8;
       border-radius: 6px;
       padding: 4px 8px;
       font-size: 11px;
@@ -399,17 +420,18 @@
     /* 中文在按钮框里视觉上偏低：下内边距多 1px，把文字往上顶 */
 
     .viewswitch button.on {
-      color: #f5c542;
-      border-color: #f5c542;
+      color: #38bdf8;
+      border-color: #38bdf8;
     }
 
     .viewswitch button:hover {
       transform: translateY(-2px);
-      border-color: #f5c542;
+      border-color: #38bdf8;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
     /* 图片墙：只显示照片，无文字 */
+
     .list.picmode {
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -449,27 +471,60 @@
       border: none;
     }
 
+    /* 银质圆环：冷灰金属拉丝，比铜钱环更克制 */
     .list.picmode .card .photo {
       width: 100%;
       height: auto;
       aspect-ratio: 1 / 1;
       border-radius: 50%;
-      border: 2px solid #333a55;
+      border: none;
+      padding: 3px;
       box-sizing: border-box;
-      transition: border-color .15s, box-shadow .15s;
+      background: conic-gradient(
+        from 210deg,
+        #3a4356 0%,
+        #6b7a92 14%,
+        #b8c4d4 28%,
+        #7c8ba3 42%,
+        #48526688 55%,
+        #8fa0b8 68%,
+        #c8d3e0 82%,
+        #6b7a92 92%,
+        #3a4356 100%
+      );
+      box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.5),
+        inset 0 0 0 1px rgba(20, 26, 36, 0.55),
+        inset 0 1px 2px rgba(255, 255, 255, 0.18);
+      transition: background .2s, box-shadow .2s, transform .2s;
     }
+
 
     .list.picmode .card .photo img {
       width: 100%;
       height: 100%;
       object-fit: cover;
       border-radius: 50%;
+      display: block;
+      position: relative;
+      z-index: 1;
     }
 
-    /* 悬停：头像描金，像游戏里被选中的角色 */
+    /* 悬停：银环变成天蓝光环 + 微微上浮 */
     .list.picmode .card:hover .photo {
-      border-color: #f5c542;
-      box-shadow: 0 0 0 2px rgba(245, 197, 66, .28);
+      background: conic-gradient(
+        from 210deg,
+        #38bdf8 0%,
+        #818cf8 30%,
+        #38bdf8 55%,
+        #a5b4fc 78%,
+        #38bdf8 100%
+      );
+      box-shadow:
+        0 4px 12px rgba(0, 0, 0, 0.6),
+        0 0 14px rgba(56, 189, 248, 0.45),
+        inset 0 0 0 1px rgba(56, 189, 248, 0.3);
+      transform: translateY(-2px);
     }
 
     /* 只保留名字，其余信息隐藏 */
@@ -483,7 +538,7 @@
     .list.picmode .card .info .n {
       font-size: 11px;
       line-height: 1.3;
-      color: #9aa3c0;
+      color: #94a3b8;
       font-weight: 400;
       white-space: nowrap;
       overflow: hidden;
@@ -507,9 +562,9 @@
     }
 
     .sort button {
-      background: #1f2233;
-      border: 1px solid #333a55;
-      color: #9aa3c0;
+      background: #131920;
+      border: 1px solid #25303d;
+      color: #94a3b8;
       border-radius: 6px;
       padding: 6px 14px;
       cursor: pointer;
@@ -517,13 +572,13 @@
     }
 
     .sort button.on {
-      color: #f5c542;
-      border-color: #f5c542;
+      color: #38bdf8;
+      border-color: #38bdf8;
     }
 
     .sort button:hover {
       transform: translateY(-2px);
-      border-color: #f5c542;
+      border-color: #38bdf8;
       box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
     }
 
@@ -531,9 +586,9 @@
 
       width: 100%;
       max-width: 660px;
-      background: #1f2233;
-      border: 1px solid #333a55;
-      color: #eee;
+      background: #131920;
+      border: 1px solid #25303d;
+      color: #e8eef5;
       border-radius: 6px;
       padding: 9px 12px;
       font-size: 14px;
@@ -542,7 +597,7 @@
     }
 
     .search:focus {
-      border-color: #34d399;
+      border-color: #38bdf8;
     }
 
     .list {
@@ -554,8 +609,8 @@
     }
 
     .card {
-      background: #1f2233;
-      border: 1px solid #333a55;
+      background: #131920;
+      border: 1px solid #25303d;
       border-radius: 10px;
       padding: 12px 16px;
       display: flex;
@@ -566,7 +621,7 @@
 
     .card:hover {
       transform: translateY(-2px);
-      border-color: #f5c542;
+      border-color: #38bdf8;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     }
         .card.highlight {
@@ -575,11 +630,11 @@
 
     @keyframes cardFlash {
       0%, 100% {
-        border-color: #333a55;
+        border-color: #25303d;
         box-shadow: none;
       }
       50% {
-        border-color: #f5c542;
+        border-color: #38bdf8;
         box-shadow: 0 0 16px rgba(245, 197, 66, 0.8);
       }
     }
@@ -595,8 +650,8 @@
       height: 64px;
       border-radius: 8px;
       object-fit: cover;
-      background: #12141f;
-      border: 1px solid #333a55;
+      background: #1a222c;
+      border: 1px solid #25303d;
       flex-shrink: 0;
       display: flex;
       align-items: center;
@@ -624,7 +679,7 @@
 
     .card .info .s {
       font-size: 13px;
-      color: #9aa3c0;
+      color: #94a3b8;
       margin-top: 3px;
     }
 
@@ -634,7 +689,7 @@
 
     .card .info .p {
       font-size: 14px;
-      color: #f5c542;
+      color: #e2c07a;
       font-weight: bold;
       margin-top: 3px;
     }
@@ -648,8 +703,9 @@
 
     .card .edit {
       background: none;
-      border: 1px solid #2f6f4f;
-      color: #34d399;
+      border: 1px solid #38bdf8;
+      color: #818cf8;
+      transition: background .15s;
       border-radius: 6px;
       padding: 6px 10px;
       cursor: pointer;
@@ -658,7 +714,7 @@
     }
 
     .card .edit:hover {
-      background: #1f3a2b;
+      background: rgba(56, 189, 248, 0.14);
     }
 
     .card .del {
@@ -703,7 +759,7 @@
       padding: 12px 16px;
       box-shadow: 0 10px 28px rgba(0, 0, 0, .5);
       font-size: 14px;
-      color: #eee;
+      color: #e8eef5;
       opacity: 0;
       pointer-events: none;
       transition: opacity .2s ease, transform .2s ease;
@@ -719,7 +775,7 @@
     }
 
     .undo-bar button {
-      background: #f5c542;
+      background: #38bdf8;
       color: #1a1a1a;
       border: none;
       border-radius: 6px;
@@ -797,10 +853,10 @@
       max-width: 520px;
       padding: 22px 24px;
       box-sizing: border-box;
-      background: linear-gradient(160deg, #1b1f30 0%, #141726 100%);
-      border: 1px solid rgba(245, 197, 66, .35);
+      background: linear-gradient(160deg, #111823 0%, #141726 100%);
+      border: 1px solid rgba(56, 189, 248, .3);
       border-radius: 16px;
-      box-shadow: 0 0 0 1px rgba(245, 197, 66, .08), 0 18px 48px rgba(0, 0, 0, .6);
+      box-shadow: 0 0 0 1px rgba(56, 189, 248, .06), 0 18px 48px rgba(0, 0, 0, .6);
       animation: sheetIn .22s ease-out;
     }
 
@@ -819,17 +875,17 @@
       align-items: center;
       justify-content: center;
       background: transparent;
-      border: 1px solid #333a55;
+      border: 1px solid #25303d;
       border-radius: 8px;
-      color: #8b93b3;
+      color: #7c8798;
       font-size: 14px;
       cursor: pointer;
       transition: color .15s, border-color .15s;
     }
 
     .sheet-close:hover {
-      color: #f5c542;
-      border-color: #f5c542;
+      color: #38bdf8;
+      border-color: #38bdf8;
     }
 
     /* 左侧：圆形头像 + 金色光环 */
@@ -842,8 +898,8 @@
       height: 168px;
       padding: 4px;
       border-radius: 50%;
-      background: conic-gradient(from 210deg, #f5c542, #8a6206 35%, #f5c542 60%, #d09a12 85%, #f5c542);
-      box-shadow: 0 0 26px rgba(245, 197, 66, .38);
+      background: conic-gradient(from 210deg, #38bdf8, #818cf8 45%, #38bdf8 100%);
+      box-shadow: 0 0 26px rgba(56, 189, 248, .32);
       box-sizing: border-box;
     }
 
@@ -867,7 +923,7 @@
       font-weight: 800;
       line-height: 1.2;
       letter-spacing: .5px;
-      background: linear-gradient(180deg, #fff6cc, #f5c542 55%, #c9931a);
+      background: linear-gradient(180deg, #ffffff 0%, #bae6fd 35%, #38bdf8 70%, #0284c7 100%);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
@@ -883,9 +939,9 @@
       padding: 2px 9px;
       font-size: 11px;
       letter-spacing: .5px;
-      color: #9aa3c0;
+      color: #94a3b8;
       background: rgba(255, 255, 255, .05);
-      border: 1px solid #333a55;
+      border: 1px solid #25303d;
       border-radius: 999px;
     }
 
@@ -919,7 +975,7 @@
     }
 
     .sheet-row .v.gold {
-      color: #f5c542;
+      color: #e2c07a;
       font-weight: 700;
     }
 
@@ -962,9 +1018,9 @@
     }
 
     .backup button {
-      background: #1f2233;
-      border: 1px solid #333a55;
-      color: #9aa3c0;
+      background: #131920;
+      border: 1px solid #25303d;
+      color: #94a3b8;
       border-radius: 6px;
       padding: 8px 16px;
       cursor: pointer;
@@ -972,14 +1028,14 @@
     }
 
     .backup button:hover {
-      border-color: #f5c542;
-      color: #f5c542;
+      border-color: #38bdf8;
+      color: #38bdf8;
     }
 
     input[type="file"]::file-selector-button {
-      background: #1f2233;
-      color: #eee;
-      border: 1px solid #333a55;
+      background: #131920;
+      color: #e8eef5;
+      border: 1px solid #25303d;
       border-radius: 6px;
       padding: 6px 12px;
       cursor: pointer;
@@ -987,8 +1043,8 @@
     }
 
     input[type="file"]::file-selector-button:hover {
-      border-color: #f5c542;
-      color: #f5c542;
+      border-color: #38bdf8;
+      color: #38bdf8;
     }
 
     .cropper {
@@ -1044,8 +1100,8 @@
   width: 1px;
 }
     #cropCanvas {
-      background: #12141f;
-      border: 1px solid #f5c542;
+      background: #1a222c;
+      border: 1px solid #38bdf8;
       border-radius: 8px;
       cursor: grab;
     }
@@ -1056,9 +1112,9 @@
     }
 
     .crop-btns button {
-      background: #1f2233;
-      border: 1px solid #333a55;
-      color: #eee;
+      background: #131920;
+      border: 1px solid #25303d;
+      color: #e8eef5;
       border-radius: 6px;
       padding: 8px 14px;
       cursor: pointer;
@@ -1066,8 +1122,8 @@
     }
 
     .crop-btns button:hover {
-      border-color: #f5c542;
-      color: #f5c542;
+      border-color: #38bdf8;
+      color: #38bdf8;
     }
 
     .empty {
@@ -1079,8 +1135,7 @@
 
     @media (max-width: 600px) {
       body {
-        background-image: linear-gradient(180deg, #151726, #1a2540);
-        background-attachment: scroll;
+        background: #0b0f14;
       }
 
       .form input {
@@ -1121,7 +1176,6 @@
         font-size: 11px;
       }
 
-    }
     }
   
     /* ===== 编辑弹窗 ===== */
@@ -1167,9 +1221,9 @@
       font-size: 12px;
       font-weight: 600;
       letter-spacing: 2px;
-      color: #cfd6ea;
-      background: #262b40;
-      border: 1px solid #3d4460;
+      color: #dbe6f2;
+      background: #1e293b;
+      border: 1px solid #334155;
       border-radius: 5px;
       /* 上 3.5 / 下 2.5：文字再下移 0.5px；左 11 / 右 8：保持上次右移 */
       padding: 3.5px 8px 2.5px 11px;
@@ -1195,9 +1249,9 @@
     }
 
     .edit-photo-btn {
-      background: #262b40;
-      border: 1px solid #3d4460;
-      color: #cfd6ea;
+      background: #1e293b;
+      border: 1px solid #334155;
+      color: #dbe6f2;
       border-radius: 7px;
       padding: 6px 12px;
       font-size: 12px;
@@ -1207,19 +1261,19 @@
     }
 
     .edit-photo-btn:hover {
-      border-color: #f5c542;
-      color: #f5c542;
+      border-color: #38bdf8;
+      color: #38bdf8;
     }
     .edit-ring { cursor: pointer; transition: transform .15s; }
     .edit-ring:hover { transform: scale(1.03); }
     .edit-field { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .edit-field .k { width: 46px; flex-shrink: 0; font-size: 12px; color: #8b93b3; }
-    .edit-field input { flex: 1; min-width: 0; background: #12141f; border: 1px solid #333a55; border-radius: 6px; padding: 8px 10px; color: #e6e9f5; font-size: 13px; outline: none; }
-    .edit-field input:focus { border-color: #f5c542; }
+    .edit-field .k { width: 46px; flex-shrink: 0; font-size: 12px; color: #7c8798; }
+    .edit-field input { flex: 1; min-width: 0; background: #1a222c; border: 1px solid #25303d; border-radius: 6px; padding: 8px 10px; color: #e6e9f5; font-size: 13px; outline: none; }
+    .edit-field input:focus { border-color: #38bdf8; }
     .edit-actions { display: flex; gap: 10px; margin-top: 16px; }
     .edit-actions button { flex: 1; height: 38px; border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer; }
-    .edit-save { background: #f5c542; color: #1a1d2b; border: none; }
-    .edit-cancel { background: transparent; color: #9aa3c0; border: 1px solid #3d4460; }
+    .edit-save { background: #38bdf8; color: #1a1d2b; border: none; }
+    .edit-cancel { background: transparent; color: #94a3b8; border: 1px solid #334155; }
 
   
     /* 保存成功小提示：居中弹出，1 秒后降低透明度淡出（无缩放） */
@@ -1254,7 +1308,7 @@
       height: 14px;
       flex: 0 0 auto;
       fill: none;
-      stroke: #22c55e;
+      stroke: #38bdf8;
       stroke-width: 3.2;
       stroke-linecap: round;
       stroke-linejoin: round;
@@ -1345,7 +1399,7 @@
     <div class="sheet-card">
       <button class="sheet-close" id="sheetClose" aria-label="关闭">✕</button>
       <div class="sheet-left">
-        <div class="sheet-ring">
+        <div class="sheet-ring" id="sheetRing">
           <img id="sheetPhoto" src="" alt="">
         </div>
       </div>
@@ -1524,7 +1578,7 @@
     // 重绘裁剪框
     function drawCrop() {
       if (!cropImg) return;
-      cropCtx.fillStyle = '#12141f';
+      cropCtx.fillStyle = '#1a222c';
       cropCtx.fillRect(0, 0, 300, 300);
       cropCtx.drawImage(cropImg, cropOffsetX, cropOffsetY, cropImg.width * cropScale, cropImg.height * cropScale);
     }
@@ -1981,6 +2035,50 @@ function compressOriginal(img, callback) {
     function openFigSheet(id) {
       const f = figs.find(x => String(x.id) === String(id));
       if (!f) return;
+      // 按角色给头像环上色
+      const RING_SETS = [
+        { keys: ['赞', 'Zane'],  colors: ['#ffffff', '#94a3b8'] },
+        { keys: ['杰', 'Jay'],   colors: ['#7dd3fc', '#1d4ed8'] },
+        { keys: ['凯', 'Kai'],   colors: ['#fca5a5', '#f59e0b'] },
+        { keys: ['劳埃德', 'Lloyd'], colors: ['#6ee7b7', '#047857'] },
+        { keys: ['寇', 'Cole'],  colors: ['#f97316', '#1f2937'] },
+        { keys: ['妮娅', 'Nya'], colors: ['#67e8f9', '#0e7490'] },
+        { keys: ['吴', 'Wu'],    colors: ['#fde68a', '#b45309'] }
+      ];
+      // 先算出色值（放在最外层，环和名字共用）
+      const nm = String(f.name || '');
+      const hit = RING_SETS.find(s => s.keys.some(k => nm.indexOf(k) >= 0));
+      const c1 = hit ? hit.colors[0] : '#94a3b8';
+      const c2 = hit ? hit.colors[1] : '#475569';
+
+      const ringEl = document.getElementById('sheetRing');
+      if (ringEl) {
+        const isColeRing = (nm.indexOf('寇') >= 0) || (nm.toLowerCase().indexOf('cole') >= 0);
+        if (isColeRing) {
+          ringEl.style.background = 'conic-gradient(from 210deg, #fdba74 0%, #f97316 40%, #ea580c 65%, #f97316 85%, #fdba74 100%)';
+          ringEl.style.boxShadow = '0 0 26px rgba(249, 115, 22, .45)';
+        } else {
+          ringEl.style.background = 'conic-gradient(from 210deg, ' + c1 + ', ' + c2 + ' 45%, ' + c1 + ' 100%)';
+          ringEl.style.boxShadow = '0 0 26px ' + c2 + '55';
+        }
+      }
+
+      // 名字颜色跟随角色环
+      const nameEl = document.querySelector('.sheet-name');
+      if (nameEl) {
+        const isCole = (nm.indexOf('寇') >= 0) || (nm.toLowerCase().indexOf('cole') >= 0);
+        if (isCole) {
+          // 寇（71806 土系机甲）：橙占七成、黑占三成的渐变
+          nameEl.style.background = 'linear-gradient(180deg, #fdba74 0%, #f97316 45%, #ea580c 100%)';
+        } else {
+          nameEl.style.background = 'linear-gradient(180deg, ' + c1 + ' 0%, ' + c2 + ' 100%)';
+        }
+        nameEl.style.webkitBackgroundClip = 'text';
+        nameEl.style.backgroundClip = 'text';
+        nameEl.style.webkitTextFillColor = 'transparent';
+        nameEl.style.webkitTextStroke = '0';
+        nameEl.style.textShadow = 'none';
+      }
       if (f.photo) {
         sheetPhoto.src = f.photo;
         sheetPhoto.style.display = 'block';
